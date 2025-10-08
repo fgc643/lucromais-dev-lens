@@ -8,7 +8,7 @@ export const calculateProfit = (product: ProductData): CalculationResults => {
   const planData = marketplace.plans[product.plan];
   if (!planData) throw new Error("Plano não encontrado");
 
-  const { salePrice, costPrice, shippingCost } = product;
+  const { salePrice, costPrice, shippingCost, packagingCost, adsCost, operationalCost, simplesNacionalRate } = product;
 
   // Calcular taxas
   const commissionFee = (salePrice * planData.commission) / 100;
@@ -21,7 +21,14 @@ export const calculateProfit = (product: ProductData): CalculationResults => {
   }
 
   const shippingFee = shippingCost * (1 - (planData.shippingDiscount || 0));
-  const totalFees = commissionFee + fixedFee + paymentFee + shippingFee;
+  
+  // Novos custos adicionados
+  const packagingFee = packagingCost || 0;
+  const adsFee = (salePrice * (adsCost || 0)) / 100;
+  const operationalFee = operationalCost || 0;
+  const simplesNacionalFee = (salePrice * (simplesNacionalRate || 0)) / 100;
+  
+  const totalFees = commissionFee + fixedFee + paymentFee + shippingFee + packagingFee + adsFee + operationalFee + simplesNacionalFee;
 
   // Calcular lucros
   const grossProfit = salePrice - costPrice;
@@ -60,6 +67,30 @@ export const calculateProfit = (product: ProductData): CalculationResults => {
       percentage: (shippingFee / salePrice) * 100,
       color: "hsl(var(--info))",
     },
+    {
+      label: "Embalagem",
+      value: packagingFee,
+      percentage: (packagingFee / salePrice) * 100,
+      color: "hsl(var(--chart-4))",
+    },
+    {
+      label: "ADS",
+      value: adsFee,
+      percentage: (adsFee / salePrice) * 100,
+      color: "hsl(var(--chart-5))",
+    },
+    {
+      label: "Operacional",
+      value: operationalFee,
+      percentage: (operationalFee / salePrice) * 100,
+      color: "hsl(var(--muted))",
+    },
+    {
+      label: "Simples Nacional",
+      value: simplesNacionalFee,
+      percentage: (simplesNacionalFee / salePrice) * 100,
+      color: "hsl(var(--chart-2))",
+    },
   ].filter(item => item.value > 0);
 
   return {
@@ -70,6 +101,10 @@ export const calculateProfit = (product: ProductData): CalculationResults => {
       commission: commissionFee,
       payment: paymentFee,
       shipping: shippingFee,
+      packaging: packagingFee,
+      ads: adsFee,
+      operational: operationalFee,
+      simplesNacional: simplesNacionalFee,
       total: totalFees,
     },
     breakdown,

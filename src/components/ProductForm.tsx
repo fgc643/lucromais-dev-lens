@@ -25,6 +25,10 @@ export const ProductForm = ({ onCalculate }: ProductFormProps) => {
     costPrice: 0,
     salePrice: 0,
     shippingCost: 0,
+    packagingCost: 0,
+    adsCost: 0,
+    operationalCost: 0,
+    simplesNacionalRate: 0,
     installments: "1x",
     marketplace: "",
     plan: "",
@@ -289,6 +293,105 @@ export const ProductForm = ({ onCalculate }: ProductFormProps) => {
                 </SelectContent>
               </Select>
               {errors.plan && <p className="text-sm text-destructive">{errors.plan}</p>}
+            </div>
+          </div>
+
+          {/* Custos Adicionais - Nova Seção */}
+          <div className="space-y-4 border-t border-primary/20 pt-6">
+            <h3 className="font-semibold text-lg flex items-center gap-2">
+              <span className="text-primary">💰</span> Custos Adicionais
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="packagingCost" className="flex items-center gap-2">
+                  Embalagem (R$)
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">Caixas, plástico bolha, fitas, etiquetas</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </Label>
+                <CurrencyInput
+                  id="packagingCost"
+                  value={formData.packagingCost}
+                  onChange={(value) => setFormData({ ...formData, packagingCost: value })}
+                  placeholder="0,00"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="adsCost" className="flex items-center gap-2">
+                  Custo de ADS (%)
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">% do preço de venda gasto com anúncios</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </Label>
+                <CurrencyInput
+                  id="adsCost"
+                  value={formData.adsCost}
+                  onChange={(value) => setFormData({ ...formData, adsCost: value })}
+                  placeholder="0,00"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="operationalCost" className="flex items-center gap-2">
+                  Custo Operacional (R$)
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">Luz, internet, funcionários, aluguel</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </Label>
+                <CurrencyInput
+                  id="operationalCost"
+                  value={formData.operationalCost}
+                  onChange={(value) => setFormData({ ...formData, operationalCost: value })}
+                  placeholder="0,00"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="simplesNacionalRate" className="flex items-center gap-2">
+                  Simples Nacional (%)
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">Alíquota do Simples Nacional (4% a 15,5%)</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </Label>
+                <CurrencyInput
+                  id="simplesNacionalRate"
+                  value={formData.simplesNacionalRate}
+                  onChange={(value) => setFormData({ ...formData, simplesNacionalRate: value })}
+                  placeholder="0,00"
+                />
+              </div>
             </div>
           </div>
 

@@ -20,6 +20,10 @@ export interface ProductData {
   costPrice: number;
   salePrice: number;
   shippingCost: number;
+  packagingCost: number;
+  adsCost: number;
+  operationalCost: number;
+  simplesNacionalRate: number;
   installments: string;
   marketplace: string;
   plan: string;
@@ -35,6 +39,10 @@ export interface CalculationResults {
     commission: number;
     payment: number;
     shipping: number;
+    packaging: number;
+    ads: number;
+    operational: number;
+    simplesNacional: number;
     total: number;
   };
   breakdown: {

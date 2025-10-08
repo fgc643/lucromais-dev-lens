@@ -1,99 +1,131 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ProductData } from "@/types/calculator";
 import { ProductForm } from "@/components/ProductForm";
 import { ResultCard } from "@/components/ResultCard";
 import { HistoryList } from "@/components/HistoryList";
 import { ComparisonModal } from "@/components/ComparisonModal";
 import { ReverseCalculator } from "@/components/ReverseCalculator";
 import { OnboardingTutorial } from "@/components/OnboardingTutorial";
-import { ProductData } from "@/types/calculator";
-import { TrendingUp } from "lucide-react";
+import { Header } from "@/components/Header";
+import { useAuth } from "@/hooks/useAuth";
+import { useProducts } from "@/hooks/useProducts";
+import { useUserSettings } from "@/hooks/useUserSettings";
+import { Calculator, TrendingUp, Loader2 } from "lucide-react";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const { products, saveProduct, deleteProduct, clearAllProducts, loading: productsLoading } = useProducts();
+  const { settings, loading: settingsLoading } = useUserSettings();
   const [currentProduct, setCurrentProduct] = useState<ProductData | null>(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
 
-  const handleCalculate = (product: ProductData) => {
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, authLoading, navigate]);
+
+  const handleCalculate = async (product: ProductData) => {
     setCurrentProduct(product);
-    setRefreshTrigger((prev) => prev + 1);
-    
-    // Scroll suave para os resultados
-    setTimeout(() => {
-      document.getElementById("results")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
+    if (user) {
+      await saveProduct(product);
+      setHistoryRefreshTrigger((prev) => prev + 1);
+    }
   };
 
-  const handleViewProduct = (product: ProductData) => {
-    setCurrentProduct(product);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const handleHistoryDelete = async (id: string) => {
+    await deleteProduct(id);
+    setHistoryRefreshTrigger((prev) => prev + 1);
   };
+
+  const handleHistoryClear = async () => {
+    await clearAllProducts();
+    setCurrentProduct(null);
+    setHistoryRefreshTrigger((prev) => prev + 1);
+  };
+
+  if (authLoading || productsLoading || settingsLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/20 to-background">
+        <div className="text-center">
+          <Calculator className="w-16 h-16 mx-auto mb-4 text-primary animate-pulse" />
+          <p className="text-muted-foreground flex items-center gap-2 justify-center">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Carregando sistema...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
       <OnboardingTutorial />
+      <Header />
       
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center shadow-lg">
-                <TrendingUp className="h-7 w-7 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Calculadora Premium
-                </h1>
-                <p className="text-sm text-muted-foreground">Análise de Lucro para Marketplaces</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <ReverseCalculator />
-              {currentProduct && <ComparisonModal baseProduct={currentProduct} />}
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Hero Section */}
-      <section className="py-12 bg-gradient-to-b from-primary/5 to-background">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">
-            Calcule o lucro líquido e margem de qualquer produto nos principais marketplaces do Brasil
-            com precisão profissional
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Análise completa de custos, taxas e rentabilidade em tempo real
+      <section className="container mx-auto px-4 py-12 text-center animate-fade-in">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-primary font-medium animate-scale-in">
+            <TrendingUp className="w-4 h-4" />
+            <span>Análise Profissional de Lucro</span>
+          </div>
+          
+          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent leading-tight">
+            Lucro Mais SaaS
+          </h1>
+          
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            Sistema completo com embalagem, ADS, custos operacionais e Simples Nacional integrados. 
+            Tudo sincronizado na nuvem! ☁️
           </p>
         </div>
       </section>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="container mx-auto px-4 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Formulário */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-8">
             <ProductForm onCalculate={handleCalculate} />
+            
+            {currentProduct && (
+              <div className="animate-fade-in">
+                <ResultCard product={currentProduct} />
+              </div>
+            )}
           </div>
 
-          {/* Histórico */}
-          <div className="lg:col-span-1">
-            <HistoryList onViewProduct={handleViewProduct} triggerRefresh={refreshTrigger} />
-          </div>
-
-          {/* Resultados */}
-          {currentProduct && (
-            <div id="results" className="lg:col-span-3">
-              <ResultCard product={currentProduct} />
+          {/* Histórico e Ferramentas */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="flex gap-2">
+              <ReverseCalculator />
+              {currentProduct && <ComparisonModal baseProduct={currentProduct} />}
             </div>
-          )}
+            
+            <HistoryList
+              key={historyRefreshTrigger}
+              products={products}
+              onItemClick={setCurrentProduct}
+              onItemDelete={handleHistoryDelete}
+              onClear={handleHistoryClear}
+            />
+          </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border mt-16 py-8 bg-card/30">
+      <footer className="border-t border-primary/20 mt-16 py-8 bg-card/30 backdrop-blur-sm">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 Lucro Mais - Calculadora Premium de Marketplaces</p>
-          <p className="mt-2">Todos os cálculos são estimativas baseadas nas taxas atuais dos marketplaces.</p>
+          <p className="font-semibold mb-2">🚀 Lucro Mais SaaS - Sistema Multi-Usuário</p>
+          <p className="mb-1">Calculadora Profissional com Embalagem, ADS, Operacional e Simples Nacional</p>
+          <p className="text-xs">Todos os cálculos são estimativas baseadas nas taxas atuais dos marketplaces.</p>
         </div>
       </footer>
     </div>
