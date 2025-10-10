@@ -42,8 +42,17 @@ export const AIProductAnalysis = ({ productName, category }: AIProductAnalysisPr
   const analyzeProduct = async () => {
     if (!productName.trim()) {
       toast({
-        title: "Erro",
-        description: "Digite o nome do produto primeiro",
+        title: "⚠️ Nome obrigatório",
+        description: "Digite o nome do produto para análise com IA",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!category) {
+      toast({
+        title: "⚠️ Categoria obrigatória",
+        description: "Selecione a categoria do produto",
         variant: "destructive",
       });
       return;
@@ -79,28 +88,44 @@ export const AIProductAnalysis = ({ productName, category }: AIProductAnalysisPr
   };
 
   return (
-    <div className="space-y-4">
-      <Button 
-        onClick={analyzeProduct}
-        disabled={loading}
-        className="w-full"
-        size="lg"
-      >
-        {loading ? (
-          <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Analisando em todos os marketplaces...
-          </>
-        ) : (
-          <>
-            <Sparkles className="mr-2 h-5 w-5" />
-            Analisar Produto com IA
-          </>
+    <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent shadow-lg">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-xl">
+          <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+          🤖 Análise Inteligente com IA
+        </CardTitle>
+        <CardDescription className="text-base">
+          Varredura automática 24/7 em todos os marketplaces brasileiros
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Button 
+          onClick={analyzeProduct}
+          disabled={loading || !productName.trim()}
+          className="w-full h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all"
+          size="lg"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+              🔍 Analisando marketplaces em tempo real...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-6 w-6" />
+              🚀 Iniciar Análise com IA
+            </>
+          )}
+        </Button>
+        
+        {!productName.trim() && (
+          <p className="text-sm text-muted-foreground text-center">
+            💡 Digite o nome do produto acima para habilitar a análise
+          </p>
         )}
-      </Button>
 
-      {analysis && (
-        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+        {analysis && (
+          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent mt-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
@@ -221,9 +246,10 @@ export const AIProductAnalysis = ({ productName, category }: AIProductAnalysisPr
                 </ul>
               </div>
             )}
-          </CardContent>
-        </Card>
-      )}
-    </div>
+            </CardContent>
+          </Card>
+        )}
+      </CardContent>
+    </Card>
   );
 };

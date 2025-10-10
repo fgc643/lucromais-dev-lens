@@ -74,7 +74,7 @@ const Index = () => {
         <div className="max-w-3xl mx-auto space-y-6">
           <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-primary font-medium animate-scale-in">
             <TrendingUp className="w-4 h-4" />
-            <span>Análise Profissional de Lucro</span>
+            <span>Análise Profissional de Lucro com IA</span>
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent leading-tight">
@@ -82,7 +82,7 @@ const Index = () => {
           </h1>
           
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Análise inteligente com IA em tempo real. Varredura completa em todos os marketplaces 24/7 com embalagem, ADS, custos operacionais e Simples Nacional integrados.
+            IA integrada analisa em tempo real todos os marketplaces 24/7. Preços, concorrência, embalagem, ADS, custos operacionais e Simples Nacional tudo automatizado.
           </p>
         </div>
       </section>
@@ -122,9 +122,9 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-primary/20 mt-16 py-8 bg-card/30 backdrop-blur-sm">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p className="font-semibold mb-2">🚀 Lucro Mais - Sistema Multi-Usuário com IA</p>
-          <p className="mb-1">Análise Inteligente 24/7 | Embalagem | ADS | Operacional | Simples Nacional</p>
-          <p className="text-xs">Varredura em tempo real em todos os marketplaces com dicas inteligentes.</p>
+          <p className="font-semibold mb-2">🚀 Lucro Mais - Sistema Multi-Usuário com IA Integrada</p>
+          <p className="mb-1">🤖 Análise Inteligente 24/7 | 📦 Embalagem | 📢 ADS | 💼 Operacional | 🧾 Simples Nacional</p>
+          <p className="text-xs">Varredura automática em tempo real de todos os marketplaces com dicas inteligentes.</p>
         </div>
       </footer>
     </div>

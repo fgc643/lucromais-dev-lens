@@ -141,16 +141,6 @@ export const ProductForm = ({ onCalculate }: ProductFormProps) => {
               {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
             </div>
 
-            {/* Análise com IA em Tempo Real */}
-            {formData.name.trim() && formData.category && (
-              <div className="md:col-span-2 animate-fade-in">
-                <AIProductAnalysis 
-                  productName={formData.name} 
-                  category={formData.category}
-                />
-              </div>
-            )}
-
             <div className="space-y-2">
               <Label htmlFor="category">Categoria</Label>
               <Select
@@ -173,6 +163,14 @@ export const ProductForm = ({ onCalculate }: ProductFormProps) => {
               </Select>
               {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
             </div>
+          </div>
+
+          {/* Análise com IA em Tempo Real - SEMPRE VISÍVEL */}
+          <div className="border-t border-primary/20 pt-6">
+            <AIProductAnalysis 
+              productName={formData.name} 
+              category={formData.category}
+            />
           </div>
 
           {/* Preços */}
