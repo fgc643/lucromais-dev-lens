@@ -12,6 +12,7 @@ import { MARKETPLACES, CATEGORIES, INSTALLMENT_OPTIONS } from "@/data/marketplac
 import { calculateProfit } from "@/utils/calculator";
 import { saveToHistory } from "@/utils/storage";
 import { toast } from "sonner";
+import { AIProductAnalysis } from "./AIProductAnalysis";
 
 interface ProductFormProps {
   onCalculate: (product: ProductData) => void;
@@ -139,6 +140,16 @@ export const ProductForm = ({ onCalculate }: ProductFormProps) => {
               />
               {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
             </div>
+
+            {/* Análise com IA em Tempo Real */}
+            {formData.name.trim() && formData.category && (
+              <div className="md:col-span-2 animate-fade-in">
+                <AIProductAnalysis 
+                  productName={formData.name} 
+                  category={formData.category}
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="category">Categoria</Label>

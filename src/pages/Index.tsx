@@ -78,12 +78,11 @@ const Index = () => {
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent leading-tight">
-            Lucro Mais SaaS
+            Lucro Mais
           </h1>
           
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Sistema completo com embalagem, ADS, custos operacionais e Simples Nacional integrados. 
-            Tudo sincronizado na nuvem! ☁️
+            Análise inteligente com IA em tempo real. Varredura completa em todos os marketplaces 24/7 com embalagem, ADS, custos operacionais e Simples Nacional integrados.
           </p>
         </div>
       </section>
@@ -123,9 +122,9 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-primary/20 mt-16 py-8 bg-card/30 backdrop-blur-sm">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p className="font-semibold mb-2">🚀 Lucro Mais SaaS - Sistema Multi-Usuário</p>
-          <p className="mb-1">Calculadora Profissional com Embalagem, ADS, Operacional e Simples Nacional</p>
-          <p className="text-xs">Todos os cálculos são estimativas baseadas nas taxas atuais dos marketplaces.</p>
+          <p className="font-semibold mb-2">🚀 Lucro Mais - Sistema Multi-Usuário com IA</p>
+          <p className="mb-1">Análise Inteligente 24/7 | Embalagem | ADS | Operacional | Simples Nacional</p>
+          <p className="text-xs">Varredura em tempo real em todos os marketplaces com dicas inteligentes.</p>
         </div>
       </footer>
     </div>
