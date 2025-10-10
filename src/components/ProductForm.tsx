@@ -103,11 +103,19 @@ export const ProductForm = ({ onCalculate }: ProductFormProps) => {
   };
 
   return (
-    <Card className="w-full shadow-elevated border-primary/20">
-      <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
-        <CardTitle className="flex items-center gap-2 text-2xl">
-          <Calculator className="h-6 w-6 text-primary" />
-          Nova Análise de Produto
+    <Card className="w-full shadow-3d border-primary/20 luxury-card card-3d overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 pointer-events-none" />
+      <CardHeader className="relative bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/20">
+        <CardTitle className="flex items-center gap-3 text-2xl card-3d-content">
+          <div className="p-2 rounded-lg bg-primary/20 border border-primary/30">
+            <Calculator className="h-7 w-7 text-primary animate-pulse" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Nova Análise de Produto
+            </p>
+            <p className="text-xs text-muted-foreground font-normal">Com IA e análise em tempo real</p>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
@@ -406,18 +414,22 @@ export const ProductForm = ({ onCalculate }: ProductFormProps) => {
 
           <Button
             type="submit"
-            className="w-full h-12 text-lg font-semibold hover:scale-105 transition-transform shadow-lg hover:shadow-glow"
+            className="w-full h-16 text-xl font-bold shadow-3d transition-all duration-500 bg-gradient-to-r from-primary via-accent to-primary bg-size-200 bg-pos-0 hover:bg-pos-100 hover:scale-105 border-2 border-primary/50"
             disabled={isCalculating}
+            style={{
+              backgroundSize: '200% 100%',
+              transition: 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            }}
           >
             {isCalculating ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Calculando...
+                <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                🔄 Calculando Lucro...
               </>
             ) : (
               <>
-                <Calculator className="mr-2 h-5 w-5" />
-                Calcular Lucro
+                <Calculator className="mr-3 h-6 w-6 animate-bounce" />
+                ✨ Calcular Lucro Agora
               </>
             )}
           </Button>

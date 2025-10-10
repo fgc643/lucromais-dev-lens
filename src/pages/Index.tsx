@@ -65,24 +65,31 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background relative overflow-hidden">
+      {/* Efeitos de fundo 3D */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-20 left-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '6s' }} />
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-profit/5 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }} />
+      </div>
+      
       <OnboardingTutorial />
       <Header />
       
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-12 text-center animate-fade-in">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-primary font-medium animate-scale-in">
-            <TrendingUp className="w-4 h-4" />
-            <span>Análise Profissional de Lucro com IA</span>
+        <div className="max-w-3xl mx-auto space-y-6 card-3d">
+          <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-primary font-medium animate-scale-in shadow-3d card-3d-content border border-primary/20">
+            <TrendingUp className="w-4 h-4 animate-bounce" />
+            <span>Análise Profissional de Lucro com IA 🤖</span>
           </div>
           
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent leading-tight">
+          <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent leading-tight card-3d-content drop-shadow-2xl">
             Lucro Mais
           </h1>
           
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            IA integrada analisa em tempo real todos os marketplaces 24/7. Preços, concorrência, embalagem, ADS, custos operacionais e Simples Nacional tudo automatizado.
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto card-3d-content backdrop-blur-sm">
+            ✨ IA integrada analisa em tempo real todos os marketplaces 24/7. Preços, concorrência, embalagem, ADS, custos operacionais e Simples Nacional tudo automatizado.
           </p>
         </div>
       </section>
@@ -120,11 +127,25 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-primary/20 mt-16 py-8 bg-card/30 backdrop-blur-sm">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p className="font-semibold mb-2">🚀 Lucro Mais - Sistema Multi-Usuário com IA Integrada</p>
-          <p className="mb-1">🤖 Análise Inteligente 24/7 | 📦 Embalagem | 📢 ADS | 💼 Operacional | 🧾 Simples Nacional</p>
-          <p className="text-xs">Varredura automática em tempo real de todos os marketplaces com dicas inteligentes.</p>
+      <footer className="border-t border-primary/20 mt-16 py-8 bg-card/30 backdrop-blur-sm shadow-3d">
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground card-3d">
+          <div className="card-3d-content">
+            <p className="font-bold mb-2 text-lg bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              ✨ Lucro Mais - Sistema Multi-Usuário com IA Integrada
+            </p>
+            <p className="mb-1 flex items-center justify-center gap-2 flex-wrap">
+              <span>🤖 Análise Inteligente 24/7</span>
+              <span>|</span>
+              <span>📦 Embalagem</span>
+              <span>|</span>
+              <span>📢 ADS</span>
+              <span>|</span>
+              <span>💼 Operacional</span>
+              <span>|</span>
+              <span>🧾 Simples Nacional</span>
+            </p>
+            <p className="text-xs">Varredura automática em tempo real de todos os marketplaces com dicas inteligentes.</p>
+          </div>
         </div>
       </footer>
     </div>
