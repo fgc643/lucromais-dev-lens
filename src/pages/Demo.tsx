@@ -227,19 +227,19 @@ const Demo = () => {
                     Experimente Agora - Grátis por 7 Dias
                   </h3>
                   <p className="text-muted-foreground">
-                  Use todas as funcionalidades premium sem compromisso
-                </p>
-              </div>
-              
-              <ProductForm onCalculate={handleCalculate} />
-              
-              {currentProduct && (
-                <div className="mt-8 animate-fade-in">
-                  <ResultCard product={currentProduct} />
+                    Use todas as funcionalidades premium sem compromisso
+                  </p>
                 </div>
-              )}
-              
-              {trialDaysLeft !== null && trialDaysLeft <= 3 && (
+                
+                <ProductForm onCalculate={handleCalculate} />
+                
+                {currentProduct && (
+                  <div className="mt-8 animate-fade-in">
+                    <ResultCard product={currentProduct} />
+                  </div>
+                )}
+                
+                {trialDaysLeft !== null && trialDaysLeft <= 3 && (
                   <Card className="p-6 border-accent/50 bg-accent/10">
                     <div className="flex items-center gap-4">
                       <Clock className="w-8 h-8 text-accent flex-shrink-0" />
