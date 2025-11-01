@@ -8,6 +8,7 @@ import { ComparisonModal } from "@/components/ComparisonModal";
 import { ReverseCalculator } from "@/components/ReverseCalculator";
 import { OnboardingTutorial } from "@/components/OnboardingTutorial";
 import { Header } from "@/components/Header";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useUserSettings } from "@/hooks/useUserSettings";
@@ -91,6 +92,14 @@ const Index = () => {
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto card-3d-content backdrop-blur-sm">
             ✨ IA integrada analisa em tempo real todos os marketplaces 24/7. Preços, concorrência, embalagem, ADS, custos operacionais e Simples Nacional tudo automatizado.
           </p>
+
+          <Button 
+            size="lg" 
+            onClick={() => navigate("/demo")}
+            className="text-lg px-8 py-6 shadow-3d hover:scale-105 transition-all bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
+          >
+            Começar Trial de 7 Dias - Grátis
+          </Button>
         </div>
       </section>
 
