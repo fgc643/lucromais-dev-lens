@@ -19,46 +19,102 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY não configurada');
     }
 
-    const systemPrompt = `Você é um copywriter especialista em vendas online e marketplaces brasileiros. 
-Sua missão é criar anúncios EXTREMAMENTE PERSUASIVOS que VENDEM.
+    const systemPrompt = `Você é o MAIOR COPYWRITER do Brasil, especialista em vendas explosivas em marketplaces. 
+Você domina TODOS os gatilhos mentais de persuasão e influência que fazem as pessoas COMPRAREM IMEDIATAMENTE.
+
+🧠 GATILHOS MENTAIS OBRIGATÓRIOS EM CADA ANÚNCIO:
+
+1. ESCASSEZ 🔥
+- "Últimas unidades disponíveis"
+- "Estoque limitadíssimo"
+- "Só restam X em estoque"
+- "Edição limitada"
+- "Exclusivo - Poucos disponíveis"
+
+2. URGÊNCIA ⏰
+- "Promoção por tempo limitado"
+- "Oferta válida apenas hoje"
+- "Preço especial acaba em breve"
+- "Não perca esta oportunidade ÚNICA"
+- "Aproveite AGORA antes que acabe"
+
+3. PROVA SOCIAL 👥
+- "Mais de X mil clientes satisfeitos"
+- "Avaliação 5 estrelas"
+- "O mais vendido da categoria"
+- "Preferido pelos brasileiros"
+- "Recomendado por especialistas"
+- "Milhares já compraram e aprovaram"
+
+4. AUTORIDADE 👑
+- "Qualidade Premium certificada"
+- "Marca líder de mercado"
+- "Tecnologia de ponta"
+- "Aprovado e testado"
+- "Garantia do fabricante"
+- "Padrão internacional de qualidade"
+
+5. RECIPROCIDADE 🎁
+- "Brinde exclusivo incluso"
+- "Frete grátis especial"
+- "Bônus surpresa"
+- "Garantia estendida de cortesia"
+
+6. COMPROMISSO 🤝
+- "Satisfação garantida ou dinheiro de volta"
+- "Garantia total sem perguntas"
+- "Experimente sem risco"
+
+7. AFEIÇÃO ❤️
+- Use linguagem calorosa e pessoal
+- Conecte emocionalmente
+- Mostre que se importa com o cliente
 
 REGRAS DE OURO:
-- Use gatilhos mentais: escassez, urgência, prova social, autoridade
-- Foque em BENEFÍCIOS, não características
-- Use linguagem emocional que conecta com o cliente
-- Adapte o tom para o marketplace específico
-- Inclua call-to-action irresistível
-- Use emojis estrategicamente para chamar atenção
-- Crie senso de urgência e exclusividade
+- NUNCA liste características, SEMPRE transforme em BENEFÍCIOS que mudam a vida
+- Use palavras de PODER: GRÁTIS, NOVO, EXCLUSIVO, GARANTIDO, VOCÊ, AGORA
+- Crie DÚVIDA no leitor: "Será que você pode perder essa oportunidade?"
+- Use números específicos (97%, 3x mais, 24 horas)
+- Emojis estratégicos para destacar e criar emoção
+- Frases curtas e impactantes
+- Adapte o tom ao marketplace (${marketplace})
 
-ESTRUTURA DO ANÚNCIO:
-1. TÍTULO: Impactante, com palavra-chave + benefício principal (máx 60 caracteres)
-2. SUBTÍTULO: Complemento persuasivo (máx 80 caracteres)
-3. DESCRIÇÃO: 3 parágrafos persuasivos focados em benefícios e transformação
-4. BULLETS: 5-7 pontos de benefícios com emojis
-5. CALL TO ACTION: Frase de fechamento irresistível
-6. TAGS/PALAVRAS-CHAVE: 10 tags relevantes para SEO
+GERE 2 VERSÕES (A e B) para teste A/B:
+- Versão A: Foco em ESCASSEZ + URGÊNCIA
+- Versão B: Foco em PROVA SOCIAL + AUTORIDADE
 
 Responda APENAS em formato JSON válido.`;
 
-    const userPrompt = `Crie um anúncio SUPER PERSUASIVO para:
+    const userPrompt = `Crie 2 ANÚNCIOS HIPNÓTICOS que vão fazer as pessoas COMPRAREM IMEDIATAMENTE:
 
-PRODUTO: ${productName}
-CATEGORIA: ${category}
-MARKETPLACE: ${marketplace}
-PREÇO DE VENDA: R$ ${salePrice?.toFixed(2) || '0,00'}
-${features ? `CARACTERÍSTICAS: ${features}` : ''}
+🎯 PRODUTO: ${productName}
+📦 CATEGORIA: ${category}  
+🛒 MARKETPLACE: ${marketplace}
+💰 PREÇO: R$ ${salePrice?.toFixed(2) || '0,00'}
+${features ? `⭐ CARACTERÍSTICAS: ${features}` : ''}
 
-Gere o anúncio otimizado para ${marketplace} que vai DOMINAR as vendas!
+Use TODOS os gatilhos mentais de persuasão. Faça o cliente sentir que PRECISA comprar AGORA ou vai se arrepender!
 
-Responda no formato JSON:
+Responda no formato JSON com 2 versões A/B:
 {
-  "titulo": "título impactante",
-  "subtitulo": "subtítulo persuasivo",
-  "descricao": "descrição completa com 3 parágrafos",
-  "bullets": ["benefício 1", "benefício 2", ...],
-  "callToAction": "frase de fechamento",
-  "tags": ["tag1", "tag2", ...]
+  "versaoA": {
+    "titulo": "título com escassez/urgência (máx 60 chars)",
+    "subtitulo": "subtítulo persuasivo (máx 80 chars)",
+    "descricao": "3 parágrafos emocionais focados em transformação e benefícios",
+    "bullets": ["benefício 1 com emoji", "benefício 2 com emoji", ...],
+    "callToAction": "CTA irresistível com urgência",
+    "tags": ["tag1", "tag2", ...],
+    "gatilhos": ["escassez", "urgência", ...]
+  },
+  "versaoB": {
+    "titulo": "título com prova social/autoridade (máx 60 chars)",
+    "subtitulo": "subtítulo persuasivo diferente (máx 80 chars)",
+    "descricao": "3 parágrafos diferentes focados em credibilidade",
+    "bullets": ["benefício 1 com emoji", "benefício 2 com emoji", ...],
+    "callToAction": "CTA diferente com autoridade",
+    "tags": ["tag1", "tag2", ...],
+    "gatilhos": ["prova_social", "autoridade", ...]
+  }
 }`;
 
     console.log('Gerando anúncio para:', productName, marketplace);
@@ -116,14 +172,19 @@ Responda no formato JSON:
       }
     } catch (parseError) {
       console.error('Erro ao parsear JSON:', parseError, content);
-      // Retornar resposta raw se não conseguir parsear
-      adData = {
-        titulo: productName,
-        subtitulo: `O melhor ${category} do ${marketplace}`,
+      // Retornar resposta raw com estrutura A/B
+      const fallbackAd = {
+        titulo: `🔥 ${productName} - ÚLTIMAS UNIDADES!`,
+        subtitulo: `O melhor ${category} do ${marketplace} - Oferta LIMITADA`,
         descricao: content,
-        bullets: [],
-        callToAction: 'Compre agora!',
-        tags: [category, marketplace]
+        bullets: ['✅ Qualidade Premium Garantida', '🚀 Entrega Rápida', '🔒 Compra 100% Segura'],
+        callToAction: '🛒 COMPRE AGORA - ESTOQUE ACABANDO!',
+        tags: [category, marketplace, 'oferta', 'promoção'],
+        gatilhos: ['escassez', 'urgência']
+      };
+      adData = {
+        versaoA: fallbackAd,
+        versaoB: { ...fallbackAd, titulo: `⭐ ${productName} - Mais Vendido!`, gatilhos: ['prova_social', 'autoridade'] }
       };
     }
 
