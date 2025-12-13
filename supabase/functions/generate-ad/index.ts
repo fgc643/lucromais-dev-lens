@@ -19,101 +19,107 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY não configurada');
     }
 
-    const systemPrompt = `Você é o MAIOR COPYWRITER do Brasil, especialista em vendas explosivas em marketplaces. 
-Você domina TODOS os gatilhos mentais de persuasão e influência que fazem as pessoas COMPRAREM IMEDIATAMENTE.
+    const systemPrompt = `Você é um COPYWRITER PROFISSIONAL BRASILEIRO, especialista em vendas em marketplaces online.
 
-🧠 GATILHOS MENTAIS OBRIGATÓRIOS EM CADA ANÚNCIO:
+⚠️ REGRA CRÍTICA - PORTUGUÊS PERFEITO:
+- Você DEVE escrever em português brasileiro IMPECÁVEL, sem NENHUM erro de ortografia ou gramática
+- NUNCA escreva palavras erradas como "BAÍSSIMO" - o correto é "BAIXÍSSIMO"
+- NUNCA use letras maiúsculas excessivas em palavras erradas
+- Revise CADA palavra antes de incluir no texto
+- Use acentuação correta: "últimas" (não "ultimas"), "promoção" (não "promocao")
+- Escreva de forma NATURAL e HUMANIZADA, como um vendedor experiente falaria
 
-1. ESCASSEZ 🔥
-- "Últimas unidades disponíveis"
-- "Estoque limitadíssimo"
-- "Só restam X em estoque"
-- "Edição limitada"
-- "Exclusivo - Poucos disponíveis"
+🎯 ESTILO DE ESCRITA HUMANIZADO:
+- Escreva como se estivesse conversando com o cliente
+- Use frases naturais e fluidas, não robóticas
+- Evite exageros artificiais - seja persuasivo mas autêntico
+- Prefira linguagem acessível e clara
+- Crie conexão emocional genuína
 
-2. URGÊNCIA ⏰
-- "Promoção por tempo limitado"
-- "Oferta válida apenas hoje"
-- "Preço especial acaba em breve"
-- "Não perca esta oportunidade ÚNICA"
-- "Aproveite AGORA antes que acabe"
+🧠 GATILHOS MENTAIS (use com naturalidade):
 
-3. PROVA SOCIAL 👥
-- "Mais de X mil clientes satisfeitos"
-- "Avaliação 5 estrelas"
-- "O mais vendido da categoria"
-- "Preferido pelos brasileiros"
-- "Recomendado por especialistas"
-- "Milhares já compraram e aprovaram"
+1. ESCASSEZ - Transmita raridade de forma elegante:
+- "Poucas unidades disponíveis"
+- "Estoque limitado"
+- "Últimas peças"
 
-4. AUTORIDADE 👑
-- "Qualidade Premium certificada"
-- "Marca líder de mercado"
-- "Tecnologia de ponta"
-- "Aprovado e testado"
-- "Garantia do fabricante"
-- "Padrão internacional de qualidade"
+2. URGÊNCIA - Crie senso de oportunidade:
+- "Oferta por tempo limitado"
+- "Aproveite enquanto disponível"
+- "Condição especial válida hoje"
 
-5. RECIPROCIDADE 🎁
-- "Brinde exclusivo incluso"
-- "Frete grátis especial"
-- "Bônus surpresa"
-- "Garantia estendida de cortesia"
+3. PROVA SOCIAL - Mostre credibilidade:
+- "Milhares de clientes satisfeitos"
+- "Avaliações positivas"
+- "Produto mais vendido"
 
-6. COMPROMISSO 🤝
-- "Satisfação garantida ou dinheiro de volta"
-- "Garantia total sem perguntas"
-- "Experimente sem risco"
+4. AUTORIDADE - Transmita confiança:
+- "Qualidade garantida"
+- "Marca de confiança"
+- "Padrão de excelência"
 
-7. AFEIÇÃO ❤️
-- Use linguagem calorosa e pessoal
-- Conecte emocionalmente
-- Mostre que se importa com o cliente
+5. RECIPROCIDADE - Ofereça valor:
+- "Frete grátis incluso"
+- "Bônus especial"
+- "Garantia estendida"
 
-REGRAS DE OURO:
-- NUNCA liste características, SEMPRE transforme em BENEFÍCIOS que mudam a vida
-- Use palavras de PODER: GRÁTIS, NOVO, EXCLUSIVO, GARANTIDO, VOCÊ, AGORA
-- Crie DÚVIDA no leitor: "Será que você pode perder essa oportunidade?"
-- Use números específicos (97%, 3x mais, 24 horas)
-- Emojis estratégicos para destacar e criar emoção
-- Frases curtas e impactantes
-- Adapte o tom ao marketplace (${marketplace})
+6. COMPROMISSO - Reduza riscos:
+- "Satisfação garantida"
+- "Devolução sem complicação"
+- "Compra segura"
 
-GERE 2 VERSÕES (A e B) para teste A/B:
-- Versão A: Foco em ESCASSEZ + URGÊNCIA
-- Versão B: Foco em PROVA SOCIAL + AUTORIDADE
+7. CONEXÃO EMOCIONAL - Humanize:
+- Use linguagem calorosa
+- Fale dos benefícios para a vida do cliente
+- Mostre que você entende as necessidades dele
+
+📝 REGRAS DE COPYWRITING:
+- Transforme características em BENEFÍCIOS reais
+- Use palavras de impacto: Grátis, Novo, Exclusivo, Você, Agora
+- Números específicos geram credibilidade (97%, 3x mais rápido)
+- Emojis estratégicos para destacar pontos importantes
+- Frases curtas e objetivas
+- Adapte o tom ao marketplace (${'' /* será preenchido */})
+
+🔄 GERE 2 VERSÕES PARA TESTE A/B:
+- Versão A: Foco em ESCASSEZ + URGÊNCIA (criar senso de oportunidade)
+- Versão B: Foco em PROVA SOCIAL + AUTORIDADE (criar confiança)
 
 Responda APENAS em formato JSON válido.`;
 
-    const userPrompt = `Crie 2 ANÚNCIOS HIPNÓTICOS que vão fazer as pessoas COMPRAREM IMEDIATAMENTE:
+    const userPrompt = `Crie 2 anúncios persuasivos e HUMANIZADOS para este produto:
 
-🎯 PRODUTO: ${productName}
-📦 CATEGORIA: ${category}  
+📦 PRODUTO: ${productName}
+📂 CATEGORIA: ${category}  
 🛒 MARKETPLACE: ${marketplace}
 💰 PREÇO: R$ ${salePrice?.toFixed(2) || '0,00'}
-${features ? `⭐ CARACTERÍSTICAS: ${features}` : ''}
+${features ? `✨ CARACTERÍSTICAS: ${features}` : ''}
 
-Use TODOS os gatilhos mentais de persuasão. Faça o cliente sentir que PRECISA comprar AGORA ou vai se arrepender!
+IMPORTANTE:
+- Português brasileiro PERFEITO, sem erros de ortografia
+- Texto natural e humanizado, como um vendedor experiente
+- Persuasivo mas autêntico, sem exageros artificiais
+- Use os gatilhos mentais de forma sutil e eficaz
 
-Responda no formato JSON com 2 versões A/B:
+Responda no formato JSON:
 {
   "versaoA": {
-    "titulo": "título com escassez/urgência (máx 60 chars)",
-    "subtitulo": "subtítulo persuasivo (máx 80 chars)",
-    "descricao": "3 parágrafos emocionais focados em transformação e benefícios",
-    "bullets": ["benefício 1 com emoji", "benefício 2 com emoji", ...],
-    "callToAction": "CTA irresistível com urgência",
-    "tags": ["tag1", "tag2", ...],
-    "gatilhos": ["escassez", "urgência", ...]
+    "titulo": "título persuasivo com escassez (máximo 60 caracteres)",
+    "subtitulo": "subtítulo complementar (máximo 80 caracteres)",
+    "descricao": "3 parágrafos naturais focando benefícios e transformação",
+    "bullets": ["benefício 1 com emoji", "benefício 2 com emoji", "benefício 3 com emoji", "benefício 4 com emoji"],
+    "callToAction": "chamada para ação convincente",
+    "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+    "gatilhos": ["escassez", "urgência"]
   },
   "versaoB": {
-    "titulo": "título com prova social/autoridade (máx 60 chars)",
-    "subtitulo": "subtítulo persuasivo diferente (máx 80 chars)",
-    "descricao": "3 parágrafos diferentes focados em credibilidade",
-    "bullets": ["benefício 1 com emoji", "benefício 2 com emoji", ...],
-    "callToAction": "CTA diferente com autoridade",
-    "tags": ["tag1", "tag2", ...],
-    "gatilhos": ["prova_social", "autoridade", ...]
+    "titulo": "título com prova social (máximo 60 caracteres)",
+    "subtitulo": "subtítulo diferente (máximo 80 caracteres)",
+    "descricao": "3 parágrafos focando credibilidade e confiança",
+    "bullets": ["benefício 1 com emoji", "benefício 2 com emoji", "benefício 3 com emoji", "benefício 4 com emoji"],
+    "callToAction": "chamada para ação diferente",
+    "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+    "gatilhos": ["prova_social", "autoridade"]
   }
 }`;
 
@@ -174,17 +180,17 @@ Responda no formato JSON com 2 versões A/B:
       console.error('Erro ao parsear JSON:', parseError, content);
       // Retornar resposta raw com estrutura A/B
       const fallbackAd = {
-        titulo: `🔥 ${productName} - ÚLTIMAS UNIDADES!`,
-        subtitulo: `O melhor ${category} do ${marketplace} - Oferta LIMITADA`,
+        titulo: `${productName} - Últimas Unidades Disponíveis`,
+        subtitulo: `O melhor ${category} do ${marketplace} com condição especial`,
         descricao: content,
-        bullets: ['✅ Qualidade Premium Garantida', '🚀 Entrega Rápida', '🔒 Compra 100% Segura'],
-        callToAction: '🛒 COMPRE AGORA - ESTOQUE ACABANDO!',
-        tags: [category, marketplace, 'oferta', 'promoção'],
+        bullets: ['✅ Qualidade Premium Garantida', '🚀 Entrega Rápida e Segura', '🔒 Compra 100% Protegida', '⭐ Avaliações Positivas'],
+        callToAction: 'Garanta o Seu Agora - Estoque Limitado',
+        tags: [category, marketplace, 'oferta', 'promoção', 'qualidade'],
         gatilhos: ['escassez', 'urgência']
       };
       adData = {
         versaoA: fallbackAd,
-        versaoB: { ...fallbackAd, titulo: `⭐ ${productName} - Mais Vendido!`, gatilhos: ['prova_social', 'autoridade'] }
+        versaoB: { ...fallbackAd, titulo: `${productName} - Escolha de Milhares de Clientes`, gatilhos: ['prova_social', 'autoridade'] }
       };
     }
 
