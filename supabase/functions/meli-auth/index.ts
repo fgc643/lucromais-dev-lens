@@ -14,15 +14,48 @@ serve(async (req) => {
   try {
     const { code, redirect_uri } = await req.json();
 
-    console.log("Iniciando troca de código por token do Mercado Livre...");
+    console.log("=== MELI AUTH START ===");
+    console.log("Code recebido:", code ? "Sim" : "Não");
+    console.log("Redirect URI:", redirect_uri);
+
+    if (!code) {
+      console.error("Código de autorização não fornecido");
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Código de autorização não fornecido",
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const clientId = "4649399957609336";
     const clientSecret = Deno.env.get("MELI_CLIENT_SECRET");
 
+    console.log("Client ID:", clientId);
+    console.log("Client Secret configurado:", clientSecret ? "Sim (" + clientSecret.length + " chars)" : "NÃO!");
+
     if (!clientSecret) {
-      console.error("MELI_CLIENT_SECRET não configurado");
-      throw new Error("Client secret não configurado");
+      console.error("MELI_CLIENT_SECRET não configurado nas variáveis de ambiente");
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Client secret não configurado no servidor",
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
+
+    const bodyParams = new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: clientId,
+      client_secret: clientSecret,
+      code: code,
+      redirect_uri: redirect_uri,
+    });
+
+    console.log("Enviando request para ML API...");
+    console.log("Body params:", bodyParams.toString().replace(clientSecret, "***HIDDEN***"));
 
     const tokenResponse = await fetch("https://api.mercadolibre.com/oauth/token", {
       method: "POST",
@@ -30,25 +63,40 @@ serve(async (req) => {
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json",
       },
-      body: new URLSearchParams({
-        grant_type: "authorization_code",
-        client_id: clientId,
-        client_secret: clientSecret,
-        code: code,
-        redirect_uri: redirect_uri,
-      }),
+      body: bodyParams,
     });
 
     const tokenData = await tokenResponse.json();
 
-    console.log("Resposta do Mercado Livre:", tokenResponse.status);
+    console.log("Status da resposta ML:", tokenResponse.status);
+    console.log("Resposta ML:", JSON.stringify(tokenData, null, 2));
 
     if (!tokenResponse.ok) {
-      console.error("Erro na resposta do ML:", tokenData);
-      throw new Error(tokenData.message || "Erro ao obter token do Mercado Livre");
+      console.error("Erro na API do Mercado Livre:", tokenData);
+      return new Response(JSON.stringify({
+        success: false,
+        error: tokenData.message || tokenData.error || "Erro ao obter token do Mercado Livre",
+        details: tokenData,
+      }), {
+        status: tokenResponse.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    console.log("Token obtido com sucesso!");
+    if (!tokenData.access_token) {
+      console.error("Token não retornado pela API:", tokenData);
+      return new Response(JSON.stringify({
+        success: false,
+        error: "Token não retornado pela API do Mercado Livre",
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    console.log("=== TOKEN OBTIDO COM SUCESSO ===");
+    console.log("User ID:", tokenData.user_id);
+    console.log("Expires in:", tokenData.expires_in);
 
     return new Response(JSON.stringify({
       success: true,
@@ -57,17 +105,22 @@ serve(async (req) => {
       expires_in: tokenData.expires_in,
       user_id: tokenData.user_id,
     }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
-  } catch (error) {
-    console.error("Erro na autenticação ML:", error);
-    const errorMessage = error instanceof Error ? error.message : "Erro interno ao processar autenticação";
+  } catch (error: unknown) {
+    console.error("=== ERRO CRÍTICO ===");
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    console.error("Mensagem:", errorMessage);
+    if (errorStack) console.error("Stack:", errorStack);
+    
     return new Response(JSON.stringify({
       success: false,
-      error: errorMessage,
+      error: errorMessage || "Erro interno ao processar autenticação",
     }), {
-      status: 400,
+      status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
