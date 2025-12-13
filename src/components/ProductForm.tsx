@@ -14,6 +14,7 @@ import { calculateProfit } from "@/utils/calculator";
 import { saveToHistory } from "@/utils/storage";
 import { toast } from "sonner";
 import { AIProductAnalysis } from "./AIProductAnalysis";
+import { AdGenerator } from "./AdGenerator";
 
 interface ProductFormProps {
   onCalculate: (product: ProductData) => void;
@@ -437,6 +438,16 @@ export const ProductForm = ({ onCalculate }: ProductFormProps) => {
             )}
           </Button>
         </form>
+
+        {/* Gerador de Anúncios IA */}
+        <div className="mt-8">
+          <AdGenerator
+            productName={formData.name}
+            category={formData.category}
+            marketplace={formData.marketplace}
+            salePrice={formData.salePrice}
+          />
+        </div>
       </CardContent>
     </Card>
   );
