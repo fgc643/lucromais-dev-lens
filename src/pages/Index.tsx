@@ -16,9 +16,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
-import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock } from "lucide-react";
+import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown } from "lucide-react";
 import MercadoLivreConnect from "@/components/MercadoLivreConnect";
-
+import { GoldenParticles } from "@/components/GoldenParticles";
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -94,12 +94,19 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 relative overflow-hidden">
-      {/* Background 3D Effects */}
+    <div className="min-h-screen bg-[hsl(225,25%,3%)] relative overflow-hidden">
+      {/* Golden Particles Effect */}
+      <GoldenParticles />
+      
+      {/* Background Premium Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-[100px] animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: "1s" }}></div>
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[hsl(42,100%,50%,0.08)] rounded-full blur-[150px] animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-[800px] h-[800px] bg-[hsl(280,60%,50%,0.05)] rounded-full blur-[180px] animate-pulse" style={{ animationDelay: "1s" }}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-[hsl(200,80%,50%,0.03)] rounded-full blur-[200px] animate-pulse" style={{ animationDelay: "2s" }}></div>
       </div>
+
+      {/* Mesh Gradient Overlay */}
+      <div className="absolute inset-0 bg-mesh pointer-events-none"></div>
 
       <div className="relative z-10">
         <OnboardingTutorial />
