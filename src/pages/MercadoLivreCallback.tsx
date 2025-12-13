@@ -34,7 +34,7 @@ const MercadoLivreCallback = () => {
           body: new URLSearchParams({
             grant_type: 'authorization_code',
             client_id: '4649399957609336',
-            client_secret: 'UCe0tu5xOGE4PSHvoqQo17aCcKbnMLf8',
+            client_secret: 'CYX21ws9WasE9Dm8OtC5zZfwzyiKnZaX',
             code: code,
             redirect_uri: 'https://lucromais-dev-lens.lovable.app/auth/mercadolivre'
           })
