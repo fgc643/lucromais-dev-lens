@@ -5,6 +5,7 @@ import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { CurrencyInput } from "./CurrencyInput";
+import { PercentageInput } from "./PercentageInput";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { Calculator, HelpCircle, Loader2 } from "lucide-react";
 import { ProductData } from "@/types/calculator";
@@ -351,16 +352,17 @@ export const ProductForm = ({ onCalculate }: ProductFormProps) => {
                         <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p className="max-w-xs">% do preço de venda gasto com anúncios</p>
+                        <p className="max-w-xs">% do preço de venda gasto com anúncios (0-100%)</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 </Label>
-                <CurrencyInput
+                <PercentageInput
                   id="adsCost"
                   value={formData.adsCost}
                   onChange={(value) => setFormData({ ...formData, adsCost: value })}
-                  placeholder="0,00"
+                  salePrice={formData.salePrice}
+                  showCalculatedValue={true}
                 />
               </div>
             </div>
@@ -402,11 +404,12 @@ export const ProductForm = ({ onCalculate }: ProductFormProps) => {
                     </Tooltip>
                   </TooltipProvider>
                 </Label>
-                <CurrencyInput
+                <PercentageInput
                   id="simplesNacionalRate"
                   value={formData.simplesNacionalRate}
                   onChange={(value) => setFormData({ ...formData, simplesNacionalRate: value })}
-                  placeholder="0,00"
+                  salePrice={formData.salePrice}
+                  showCalculatedValue={true}
                 />
               </div>
             </div>
