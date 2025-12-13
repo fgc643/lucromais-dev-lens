@@ -27,8 +27,9 @@ const Index = () => {
   const [currentProduct, setCurrentProduct] = useState<ProductData | null>(null);
   const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
   const [trialDaysLeft, setTrialDaysLeft] = useState<number | null>(null);
+  // DESATIVADO TEMPORARIAMENTE - trial sempre liberado
   const [isTrialExpired, setIsTrialExpired] = useState(false);
-  const [isLoadingTrial, setIsLoadingTrial] = useState(true);
+  const [isLoadingTrial, setIsLoadingTrial] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -41,59 +42,16 @@ const Index = () => {
     }
   }, [user, authLoading, navigate]);
 
+  // DESATIVADO TEMPORARIAMENTE - função de trial suspensa para validação
   const checkTrialStatus = async () => {
-    try {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("created_at, subscription_plan")
-        .eq("id", user?.id)
-        .single();
-
-      if (!profile) {
-        setIsLoadingTrial(false);
-        return;
-      }
-
-      // Se já é assinante premium, libera acesso total
-      if (profile.subscription_plan === "premium") {
-        setIsTrialExpired(false);
-        setTrialDaysLeft(null);
-        setIsLoadingTrial(false);
-        return;
-      }
-
-      const createdAt = new Date(profile.created_at);
-      const now = new Date();
-      const diffTime = now.getTime() - createdAt.getTime();
-      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-      const daysLeft = 7 - diffDays;
-
-      setTrialDaysLeft(daysLeft);
-      setIsTrialExpired(daysLeft <= 0);
-      setIsLoadingTrial(false);
-
-      if (daysLeft <= 3 && daysLeft > 0) {
-        toast({
-          title: "⏰ Trial acabando!",
-          description: `Restam apenas ${daysLeft} dias do seu período de teste.`,
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error("Erro ao verificar trial:", error);
-      setIsLoadingTrial(false);
-    }
+    // Trial desativado - acesso liberado para todos
+    setIsTrialExpired(false);
+    setTrialDaysLeft(null);
+    setIsLoadingTrial(false);
   };
 
   const handleCalculate = async (product: ProductData) => {
-    if (isTrialExpired) {
-      toast({
-        title: "⚠️ Trial Expirado",
-        description: "Faça upgrade para continuar calculando!",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Bloqueio de trial desativado temporariamente
     setCurrentProduct(product);
     if (user) {
       await saveProduct(product);
