@@ -1,85 +1,85 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const MercadoLivreCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const code = searchParams.get("code");
-  const error = searchParams.get("error");
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [message, setMessage] = useState("Processando autenticação...");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    if (error) {
-      setStatus("error");
-      setMessage("Autenticação cancelada ou negada pelo usuário.");
-      return;
-    }
-
     if (code) {
       exchangeCodeForToken(code);
     } else {
       setStatus("error");
-      setMessage("Nenhum código de autorização recebido.");
+      setErrorMessage("Nenhum código de autorização recebido.");
     }
-  }, [code, error]);
+  }, [code]);
 
   const exchangeCodeForToken = async (authCode: string) => {
     try {
-      setMessage("Trocando código por token de acesso...");
-      
-      const { data, error } = await supabase.functions.invoke("meli-auth", {
-        body: {
+      const response = await fetch("https://api.mercadolibre.com/oauth/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          grant_type: "authorization_code",
+          client_id: "4649399957609336",
+          client_secret: "UCe0tu5xOGE4PSHvoqQo17aCcKbnMLf8",
           code: authCode,
           redirect_uri: "https://lucromais-dev-lens.lovable.app/auth/mercadolivre",
-        },
+        }),
       });
 
-      if (error) {
-        console.error("Erro na edge function:", error);
-        throw new Error(error.message || "Erro ao processar autenticação");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || "Erro ao obter token");
       }
 
-      if (!data.success) {
-        throw new Error(data.error || "Erro desconhecido");
-      }
-
-      // Salvar tokens no localStorage
+      // Salvar access_token em localStorage
       localStorage.setItem("meli_token", data.access_token);
+      
       if (data.refresh_token) {
         localStorage.setItem("meli_refresh_token", data.refresh_token);
       }
+      
       if (data.user_id) {
         localStorage.setItem("meli_user_id", data.user_id.toString());
       }
 
       setStatus("success");
-      setMessage("Conectado com sucesso ao Mercado Livre!");
 
       toast({
-        title: "Mercado Livre conectado!",
+        title: "Conectado ao Mercado Livre!",
         description: "Sua conta foi vinculada com sucesso.",
       });
 
-      // Redirecionar após 2 segundos
+      // Redirecionar para página principal após 2 segundos
       setTimeout(() => {
         navigate("/");
       }, 2000);
 
-    } catch (err) {
-      console.error("Erro ao trocar código:", err);
+    } catch (error) {
+      console.error("Erro ao trocar código:", error);
       setStatus("error");
-      setMessage(err instanceof Error ? err.message : "Erro ao conectar com o Mercado Livre");
+      setErrorMessage(error instanceof Error ? error.message : "Erro ao conectar com o Mercado Livre");
       
       toast({
         title: "Erro na conexão",
-        description: err instanceof Error ? err.message : "Erro ao conectar com o Mercado Livre",
+        description: error instanceof Error ? error.message : "Erro ao conectar com o Mercado Livre",
         variant: "destructive",
       });
     }
+  };
+
+  const handleRetry = () => {
+    navigate("/");
   };
 
   return (
@@ -105,26 +105,28 @@ const MercadoLivreCallback = () => {
 
         <div>
           <h1 className="text-2xl font-bold text-foreground mb-2">
-            {status === "loading" && "Conectando ao Mercado Livre"}
-            {status === "success" && "Conexão estabelecida!"}
+            {status === "loading" && "Conectando com Mercado Livre..."}
+            {status === "success" && "Conectado ao Mercado Livre!"}
             {status === "error" && "Erro na conexão"}
           </h1>
-          <p className="text-muted-foreground">{message}</p>
+          {status === "loading" && (
+            <p className="text-muted-foreground">Aguarde enquanto processamos sua autenticação...</p>
+          )}
+          {status === "success" && (
+            <p className="text-muted-foreground">Redirecionando para a página principal...</p>
+          )}
+          {status === "error" && (
+            <p className="text-muted-foreground">{errorMessage}</p>
+          )}
         </div>
 
-        {status === "success" && (
-          <p className="text-sm text-muted-foreground">
-            Redirecionando para a página principal...
-          </p>
-        )}
-
         {status === "error" && (
-          <button
-            onClick={() => navigate("/")}
-            className="mt-4 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          <Button
+            onClick={handleRetry}
+            className="mt-4 bg-[#FFE600] hover:bg-[#FFE600]/90 text-black font-semibold"
           >
-            Voltar para a página inicial
-          </button>
+            Tentar Novamente
+          </Button>
         )}
       </div>
     </div>
