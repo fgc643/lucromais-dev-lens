@@ -17,6 +17,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
 import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock } from "lucide-react";
+import MercadoLivreConnect from "@/components/MercadoLivreConnect";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -245,6 +246,9 @@ const Index = () => {
 
               {/* Histórico e Ferramentas */}
               <div className="lg:col-span-1 space-y-6">
+                {/* Mercado Livre Connection */}
+                <MercadoLivreConnect />
+                
                 <div className="flex gap-2">
                   <ReverseCalculator />
                   {currentProduct && <ComparisonModal baseProduct={currentProduct} />}
