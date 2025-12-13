@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const MercadoLivreCallback = () => {
   const [searchParams] = useSearchParams();
@@ -25,25 +26,22 @@ const MercadoLivreCallback = () => {
       try {
         setMessage('Trocando código por token...');
         
-        const response = await fetch('https://api.mercadolibre.com/oauth/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept': 'application/json'
-          },
-          body: new URLSearchParams({
-            grant_type: 'authorization_code',
-            client_id: '4649399957609336',
-            client_secret: 'CYX21ws9WasE9Dm8OtC5zZfwzyiKnZaX',
+        console.log('Chamando Edge Function meli-auth...');
+        
+        const { data, error } = await supabase.functions.invoke('meli-auth', {
+          body: {
             code: code,
             redirect_uri: 'https://lucromais-dev-lens.lovable.app/auth/mercadolivre'
-          })
+          }
         });
 
-        const data = await response.json();
-        console.log('Resposta API ML:', data);
+        console.log('Resposta Edge Function:', data, error);
 
-        if (data.access_token) {
+        if (error) {
+          throw new Error(error.message || 'Erro na Edge Function');
+        }
+
+        if (data?.success && data?.access_token) {
           localStorage.setItem('meli_token', data.access_token);
           localStorage.setItem('meli_refresh_token', data.refresh_token || '');
           localStorage.setItem('meli_user_id', String(data.user_id || ''));
@@ -57,7 +55,7 @@ const MercadoLivreCallback = () => {
             else navigate('/');
           }, 1000);
         } else {
-          throw new Error(data.message || data.error || 'Token não recebido');
+          throw new Error(data?.error || 'Token não recebido');
         }
       } catch (error) {
         console.error('Erro ao trocar token:', error);
