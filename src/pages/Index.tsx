@@ -10,6 +10,7 @@ import { OnboardingTutorial } from "@/components/OnboardingTutorial";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ParallaxCard } from "@/components/ParallaxCard";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -152,29 +153,29 @@ const Index = () => {
             </p>
 
             <div className="grid md:grid-cols-3 gap-6 mt-12">
-              <Card className="p-6 card-3d hover:scale-105 transition-transform cascade-init animate-cascade-glow cascade-delay-5">
+              <ParallaxCard className="p-6 cascade-init animate-cascade-glow cascade-delay-5">
                 <TrendingUp className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-bold text-lg mb-2">Análise Instantânea</h3>
                 <p className="text-sm text-muted-foreground">
                   IA analisa seu produto em segundos e entrega insights acionáveis
                 </p>
-              </Card>
+              </ParallaxCard>
               
-              <Card className="p-6 card-3d hover:scale-105 transition-transform cascade-init animate-cascade-glow cascade-delay-6">
+              <ParallaxCard className="p-6 cascade-init animate-cascade-glow cascade-delay-6">
                 <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-bold text-lg mb-2">Decisões Seguras</h3>
                 <p className="text-sm text-muted-foreground">
                   Evite prejuízos com alertas inteligentes e recomendações precisas
                 </p>
-              </Card>
+              </ParallaxCard>
               
-              <Card className="p-6 card-3d hover:scale-105 transition-transform cascade-init animate-cascade-glow cascade-delay-7">
+              <ParallaxCard className="p-6 cascade-init animate-cascade-glow cascade-delay-7">
                 <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-bold text-lg mb-2">Resultados 3D</h3>
                 <p className="text-sm text-muted-foreground">
                   Interface luxuosa com feedback visual instantâneo de lucro/prejuízo
                 </p>
-              </Card>
+              </ParallaxCard>
             </div>
           </div>
         </section>
