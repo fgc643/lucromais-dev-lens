@@ -137,23 +137,23 @@ const Index = () => {
 
         {/* Hero Section Persuasivo */}
         <section className="container mx-auto px-4 py-12 text-center">
-          <div className="max-w-4xl mx-auto space-y-6 card-3d p-8">
-            <Badge className="mb-4 gap-2" variant="secondary">
+          <div className="max-w-4xl mx-auto space-y-6 card-3d p-8 cascade-init animate-cascade-hero">
+            <Badge className="mb-4 gap-2 cascade-init animate-cascade-3d cascade-delay-2" variant="secondary">
               <Zap className="w-4 h-4" />
               Tecnologia de IA Avançada
             </Badge>
             
-            <h2 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
+            <h2 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent cascade-init animate-title-cascade cascade-delay-3">
               Maximize Seus Lucros com Inteligência Artificial
             </h2>
             
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto cascade-init animate-cascade-3d cascade-delay-4">
               Análise em tempo real, decisões inteligentes e lucros maximizados. 
               A calculadora mais avançada do mercado agora ao seu alcance.
             </p>
 
             <div className="grid md:grid-cols-3 gap-6 mt-12">
-              <Card className="p-6 card-3d hover:scale-105 transition-transform">
+              <Card className="p-6 card-3d hover:scale-105 transition-transform cascade-init animate-cascade-glow cascade-delay-5">
                 <TrendingUp className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-bold text-lg mb-2">Análise Instantânea</h3>
                 <p className="text-sm text-muted-foreground">
@@ -161,7 +161,7 @@ const Index = () => {
                 </p>
               </Card>
               
-              <Card className="p-6 card-3d hover:scale-105 transition-transform">
+              <Card className="p-6 card-3d hover:scale-105 transition-transform cascade-init animate-cascade-glow cascade-delay-6">
                 <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-bold text-lg mb-2">Decisões Seguras</h3>
                 <p className="text-sm text-muted-foreground">
@@ -169,7 +169,7 @@ const Index = () => {
                 </p>
               </Card>
               
-              <Card className="p-6 card-3d hover:scale-105 transition-transform">
+              <Card className="p-6 card-3d hover:scale-105 transition-transform cascade-init animate-cascade-glow cascade-delay-7">
                 <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-bold text-lg mb-2">Resultados 3D</h3>
                 <p className="text-sm text-muted-foreground">
@@ -276,19 +276,19 @@ const Index = () => {
         {/* Social Proof */}
         <section className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-2xl font-bold mb-8">
+            <h3 className="text-2xl font-bold mb-8 cascade-init animate-title-cascade cascade-delay-8">
               Junte-se a milhares de empreendedores
             </h3>
             <div className="grid md:grid-cols-3 gap-8">
-              <div>
+              <div className="cascade-init animate-stats-cascade cascade-delay-9">
                 <div className="text-4xl font-bold text-primary mb-2">+5.000</div>
                 <div className="text-muted-foreground">Usuários ativos</div>
               </div>
-              <div>
+              <div className="cascade-init animate-stats-cascade cascade-delay-10">
                 <div className="text-4xl font-bold text-primary mb-2">R$ 2M+</div>
                 <div className="text-muted-foreground">Lucros otimizados</div>
               </div>
-              <div>
+              <div className="cascade-init animate-stats-cascade" style={{ animationDelay: '1.1s' }}>
                 <div className="text-4xl font-bold text-primary mb-2">4.9★</div>
                 <div className="text-muted-foreground">Avaliação média</div>
               </div>
