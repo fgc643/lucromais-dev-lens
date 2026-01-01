@@ -17,9 +17,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
-import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown } from "lucide-react";
+import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown, Users } from "lucide-react";
 import MercadoLivreConnect from "@/components/MercadoLivreConnect";
 import { GoldenParticles } from "@/components/GoldenParticles";
+import { SupplierManager } from "@/components/SupplierManager";
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -272,6 +273,17 @@ const Index = () => {
             </div>
           )}
         </main>
+
+        {/* Seção de Fornecedores */}
+        <section className="container mx-auto px-4 py-12">
+          <ParallaxCard className="p-6 cascade-init animate-cascade-glow">
+            <div className="flex items-center gap-3 mb-6">
+              <Users className="w-6 h-6 text-primary" />
+              <h3 className="text-2xl font-bold">Meus Fornecedores</h3>
+            </div>
+            <SupplierManager />
+          </ParallaxCard>
+        </section>
 
         {/* Social Proof */}
         <section className="container mx-auto px-4 py-12">
