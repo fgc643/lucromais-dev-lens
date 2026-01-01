@@ -76,6 +76,11 @@ const Auth = () => {
             
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
+                <div className="p-3 mb-2 rounded-lg bg-primary/10 border border-primary/20">
+                  <p className="text-sm text-muted-foreground text-center">
+                    Novo por aqui? <span className="text-primary font-medium">Crie sua conta</span> na aba "Criar Conta" para começar!
+                  </p>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-email">Email</Label>
                   <Input
