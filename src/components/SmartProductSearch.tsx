@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,10 +17,17 @@ import {
   Sparkles,
   ArrowDown,
   Award,
-  RefreshCw
+  RefreshCw,
+  SlidersHorizontal,
+  ArrowUpDown,
+  Filter,
+  X
 } from 'lucide-react';
 import { CATEGORIES } from '@/data/marketplaces';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Slider } from '@/components/ui/slider';
+import { Label } from '@/components/ui/label';
 
 interface Product {
   name: string;
@@ -58,11 +65,35 @@ interface SearchResults {
   insights: SearchInsights;
 }
 
+type SortOption = 'relevance' | 'price_asc' | 'price_desc' | 'rating' | 'discount';
+
+const parsePrice = (priceStr: string): number => {
+  if (!priceStr) return 0;
+  const cleaned = priceStr.replace(/[^\d,]/g, '').replace(',', '.');
+  return parseFloat(cleaned) || 0;
+};
+
+const parseDiscount = (discountStr?: string): number => {
+  if (!discountStr) return 0;
+  const cleaned = discountStr.replace(/[^\d]/g, '');
+  return parseInt(cleaned) || 0;
+};
+
+const parseRating = (ratingStr?: string): number => {
+  if (!ratingStr) return 0;
+  return parseFloat(ratingStr) || 0;
+};
+
 export const SmartProductSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [category, setCategory] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<SearchResults | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(50000);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000]);
+  const [sortBy, setSortBy] = useState<SortOption>('relevance');
   const { toast } = useToast();
 
   const handleSearch = async () => {
@@ -107,6 +138,52 @@ export const SmartProductSearch = () => {
       setIsLoading(false);
     }
   };
+
+  // Filter and sort products
+  const filteredAndSortedResults = useMemo(() => {
+    if (!results?.marketplaces) return null;
+
+    const filtered = results.marketplaces.map(marketplace => ({
+      ...marketplace,
+      products: marketplace.products?.filter(product => {
+        const price = parsePrice(product.price);
+        return price >= priceRange[0] && price <= priceRange[1];
+      }) || []
+    })).filter(marketplace => marketplace.products.length > 0);
+
+    // Sort products within each marketplace
+    const sorted = filtered.map(marketplace => ({
+      ...marketplace,
+      products: [...marketplace.products].sort((a, b) => {
+        switch (sortBy) {
+          case 'price_asc':
+            return parsePrice(a.price) - parsePrice(b.price);
+          case 'price_desc':
+            return parsePrice(b.price) - parsePrice(a.price);
+          case 'rating':
+            return parseRating(b.rating) - parseRating(a.rating);
+          case 'discount':
+            return parseDiscount(b.discount) - parseDiscount(a.discount);
+          default:
+            return 0;
+        }
+      })
+    }));
+
+    return sorted;
+  }, [results, priceRange, sortBy]);
+
+  const totalFilteredProducts = useMemo(() => {
+    if (!filteredAndSortedResults) return 0;
+    return filteredAndSortedResults.reduce((acc, m) => acc + m.products.length, 0);
+  }, [filteredAndSortedResults]);
+
+  const clearFilters = () => {
+    setPriceRange([0, 50000]);
+    setSortBy('relevance');
+  };
+
+  const hasActiveFilters = priceRange[0] > 0 || priceRange[1] < 50000 || sortBy !== 'relevance';
 
   const getMarketplaceBgColor = (name: string) => {
     const colors: Record<string, string> = {
@@ -180,6 +257,146 @@ export const SmartProductSearch = () => {
             )}
           </Button>
         </div>
+
+        {/* Filters Section */}
+        {results && !isLoading && (
+          <Collapsible open={showFilters} onOpenChange={setShowFilters}>
+            <div className="flex items-center justify-between">
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filtros e Ordenação
+                  {hasActiveFilters && (
+                    <Badge variant="secondary" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                      !
+                    </Badge>
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+              
+              <div className="flex items-center gap-2">
+                {hasActiveFilters && (
+                  <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1 text-muted-foreground">
+                    <X className="h-4 w-4" />
+                    Limpar filtros
+                  </Button>
+                )}
+                <Badge variant="outline">
+                  {totalFilteredProducts} produtos encontrados
+                </Badge>
+              </div>
+            </div>
+
+            <CollapsibleContent className="mt-4">
+              <Card className="p-4 bg-muted/30">
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Price Range Filter */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4 text-primary" />
+                      <Label className="font-semibold">Faixa de Preço</Label>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <Slider
+                        value={priceRange}
+                        onValueChange={(value) => setPriceRange(value as [number, number])}
+                        min={0}
+                        max={50000}
+                        step={100}
+                        className="w-full"
+                      />
+                      
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1">
+                          <Label className="text-xs text-muted-foreground">Mínimo</Label>
+                          <Input
+                            type="number"
+                            value={priceRange[0]}
+                            onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                            className="h-9"
+                            placeholder="R$ 0"
+                          />
+                        </div>
+                        <span className="text-muted-foreground mt-5">até</span>
+                        <div className="flex-1">
+                          <Label className="text-xs text-muted-foreground">Máximo</Label>
+                          <Input
+                            type="number"
+                            value={priceRange[1]}
+                            onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                            className="h-9"
+                            placeholder="R$ 50.000"
+                          />
+                        </div>
+                      </div>
+                      
+                      <p className="text-sm text-muted-foreground">
+                        R$ {priceRange[0].toLocaleString('pt-BR')} - R$ {priceRange[1].toLocaleString('pt-BR')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Sort Options */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <ArrowUpDown className="h-4 w-4 text-primary" />
+                      <Label className="font-semibold">Ordenar por</Label>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant={sortBy === 'relevance' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSortBy('relevance')}
+                        className="justify-start gap-2"
+                      >
+                        <Sparkles className="h-4 w-4" />
+                        Relevância
+                      </Button>
+                      <Button
+                        variant={sortBy === 'price_asc' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSortBy('price_asc')}
+                        className="justify-start gap-2"
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                        Menor Preço
+                      </Button>
+                      <Button
+                        variant={sortBy === 'price_desc' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSortBy('price_desc')}
+                        className="justify-start gap-2"
+                      >
+                        <TrendingUp className="h-4 w-4" />
+                        Maior Preço
+                      </Button>
+                      <Button
+                        variant={sortBy === 'rating' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSortBy('rating')}
+                        className="justify-start gap-2"
+                      >
+                        <Star className="h-4 w-4" />
+                        Melhor Avaliação
+                      </Button>
+                      <Button
+                        variant={sortBy === 'discount' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => setSortBy('discount')}
+                        className="justify-start gap-2 col-span-2"
+                      >
+                        <Award className="h-4 w-4" />
+                        Maior Desconto
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
 
         {/* Loading State */}
         {isLoading && (
@@ -256,7 +473,7 @@ export const SmartProductSearch = () => {
             )}
 
             {/* Marketplace Results */}
-            {results.marketplaces?.map((marketplace, idx) => (
+            {filteredAndSortedResults?.map((marketplace, idx) => (
               <div key={idx} className="space-y-3">
                 <div className={`flex items-center gap-2 p-3 rounded-lg border ${getMarketplaceBgColor(marketplace.name)}`}>
                   <span className="text-2xl">{marketplace.logo}</span>
@@ -351,11 +568,21 @@ export const SmartProductSearch = () => {
             ))}
 
             {/* No results message */}
-            {(!results.marketplaces || results.marketplaces.length === 0) && (
+            {(!filteredAndSortedResults || filteredAndSortedResults.length === 0) && (
               <div className="text-center py-8 text-muted-foreground">
                 <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Nenhum resultado encontrado para sua busca.</p>
-                <p className="text-sm">Tente usar termos diferentes ou mais específicos.</p>
+                <p>Nenhum resultado encontrado {hasActiveFilters ? 'com os filtros aplicados' : 'para sua busca'}.</p>
+                <p className="text-sm">
+                  {hasActiveFilters 
+                    ? 'Tente ajustar os filtros de preço ou ordenação.' 
+                    : 'Tente usar termos diferentes ou mais específicos.'}
+                </p>
+                {hasActiveFilters && (
+                  <Button variant="outline" size="sm" onClick={clearFilters} className="mt-4 gap-2">
+                    <X className="h-4 w-4" />
+                    Limpar Filtros
+                  </Button>
+                )}
               </div>
             )}
           </div>
