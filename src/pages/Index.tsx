@@ -254,9 +254,6 @@ const Index = () => {
 
               {/* Histórico e Ferramentas */}
               <div className="lg:col-span-1 space-y-6">
-                {/* Mercado Livre Connection */}
-                <MercadoLivreConnect />
-                
                 <div className="flex gap-2">
                   <ReverseCalculator />
                   {currentProduct && <ComparisonModal baseProduct={currentProduct} />}
