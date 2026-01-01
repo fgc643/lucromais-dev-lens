@@ -17,10 +17,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
-import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown, Users } from "lucide-react";
-import MercadoLivreConnect from "@/components/MercadoLivreConnect";
+import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown, Users, Search } from "lucide-react";
 import { GoldenParticles } from "@/components/GoldenParticles";
 import { SupplierManager } from "@/components/SupplierManager";
+import { SmartProductSearch } from "@/components/SmartProductSearch";
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -270,6 +270,13 @@ const Index = () => {
             </div>
           )}
         </main>
+
+        {/* Seção de Busca Inteligente */}
+        <section className="container mx-auto px-4 py-12">
+          <ParallaxCard className="cascade-init animate-cascade-glow">
+            <SmartProductSearch />
+          </ParallaxCard>
+        </section>
 
         {/* Seção de Fornecedores */}
         <section className="container mx-auto px-4 py-12">
