@@ -125,6 +125,8 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          subscription_active: boolean | null
+          subscription_expires_at: string | null
           subscription_plan:
             | Database["public"]["Enums"]["subscription_plan"]
             | null
@@ -136,6 +138,8 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          subscription_active?: boolean | null
+          subscription_expires_at?: string | null
           subscription_plan?:
             | Database["public"]["Enums"]["subscription_plan"]
             | null
@@ -147,6 +151,8 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          subscription_active?: boolean | null
+          subscription_expires_at?: string | null
           subscription_plan?:
             | Database["public"]["Enums"]["subscription_plan"]
             | null
@@ -277,6 +283,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_subscription_status: {
+        Args: { user_id: string }
+        Returns: {
+          days_left: number
+          is_expired: boolean
+          is_subscribed: boolean
+          is_trial: boolean
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
