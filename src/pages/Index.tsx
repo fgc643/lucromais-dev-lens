@@ -30,9 +30,9 @@ const Index = () => {
   const [currentProduct, setCurrentProduct] = useState<ProductData | null>(null);
   const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
   const [trialDaysLeft, setTrialDaysLeft] = useState<number | null>(null);
-  // DESATIVADO TEMPORARIAMENTE - trial sempre liberado
   const [isTrialExpired, setIsTrialExpired] = useState(false);
-  const [isLoadingTrial, setIsLoadingTrial] = useState(false);
+  const [isLoadingTrial, setIsLoadingTrial] = useState(true);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -45,12 +45,33 @@ const Index = () => {
     }
   }, [user, authLoading, navigate]);
 
-  // DESATIVADO TEMPORARIAMENTE - função de trial suspensa para validação
   const checkTrialStatus = async () => {
-    // Trial desativado - acesso liberado para todos
-    setIsTrialExpired(false);
-    setTrialDaysLeft(null);
-    setIsLoadingTrial(false);
+    if (!user) return;
+    
+    setIsLoadingTrial(true);
+    try {
+      const { data, error } = await supabase
+        .rpc('check_subscription_status', { user_id: user.id });
+      
+      if (error) {
+        console.error('Error checking subscription:', error);
+        setIsTrialExpired(false);
+        setTrialDaysLeft(null);
+        setIsSubscribed(false);
+        return;
+      }
+      
+      if (data && data.length > 0) {
+        const status = data[0];
+        setIsTrialExpired(status.is_expired);
+        setTrialDaysLeft(status.is_trial ? status.days_left : null);
+        setIsSubscribed(status.is_subscribed);
+      }
+    } catch (error) {
+      console.error('Error checking trial status:', error);
+    } finally {
+      setIsLoadingTrial(false);
+    }
   };
 
   const handleCalculate = async (product: ProductData) => {
@@ -65,8 +86,11 @@ const Index = () => {
   const handleUpgrade = () => {
     toast({
       title: "💎 Upgrade para Premium",
-      description: "Funcionalidade de pagamento será implementada em breve!",
+      description: "Entre em contato pelo WhatsApp para liberar seu acesso: R$99/mês",
     });
+    // Open WhatsApp with pre-filled message
+    const message = encodeURIComponent(`Olá! Gostaria de assinar o plano Premium do Lucro Mais IA por R$99/mês. Meu email de cadastro é: ${user?.email}`);
+    window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
   };
 
   const handleHistoryDelete = async (id: string) => {
@@ -121,16 +145,22 @@ const Index = () => {
                 Lucro Mais IA
               </h1>
             </div>
-            {!isTrialExpired && trialDaysLeft !== null && (
-              <Badge variant="outline" className="gap-2 px-4 py-2 text-sm">
-                <Clock className="w-4 h-4" />
-                {trialDaysLeft} dias restantes
+            {isSubscribed && (
+              <Badge variant="default" className="gap-2 px-4 py-2 bg-primary text-primary-foreground">
+                <Crown className="w-4 h-4" />
+                Premium Ativo
               </Badge>
             )}
-            {isTrialExpired && (
+            {!isSubscribed && !isTrialExpired && trialDaysLeft !== null && (
+              <Badge variant="outline" className="gap-2 px-4 py-2 text-sm">
+                <Clock className="w-4 h-4" />
+                {trialDaysLeft} {trialDaysLeft === 1 ? 'dia restante' : 'dias restantes'}
+              </Badge>
+            )}
+            {!isSubscribed && isTrialExpired && (
               <Badge variant="destructive" className="gap-2 px-4 py-2">
                 <Lock className="w-4 h-4" />
-                Trial Expirado
+                Acesso Bloqueado
               </Badge>
             )}
           </div>
@@ -183,13 +213,15 @@ const Index = () => {
 
         {/* Calculadora ou Bloqueio */}
         <main className="container mx-auto px-4 pb-16">
-          {isTrialExpired ? (
-            <Card className="max-w-4xl mx-auto p-12 text-center card-3d luxury-card border-2 border-destructive/50">
-              <Lock className="w-24 h-24 text-destructive mx-auto mb-6 animate-pulse" />
-              <h3 className="text-3xl font-bold mb-4">Trial Expirado</h3>
+          {isTrialExpired && !isSubscribed ? (
+            <Card className="max-w-4xl mx-auto p-12 text-center card-3d luxury-card border-2 border-primary/50">
+              <Lock className="w-24 h-24 text-primary mx-auto mb-6 animate-pulse" />
+              <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                Seu Período de Teste Terminou
+              </h3>
               <p className="text-lg text-muted-foreground mb-8 max-w-md mx-auto">
-                Seu período de teste de 7 dias terminou. 
-                Faça upgrade para continuar usando todas as funcionalidades premium!
+                Seu período de teste gratuito de 7 dias expirou. 
+                Assine agora por apenas R$99/mês e continue maximizando seus lucros!
               </p>
               
               <div className="space-y-4 max-w-md mx-auto mb-8">
@@ -199,26 +231,40 @@ const Index = () => {
                 </div>
                 <div className="flex items-center gap-3 text-left">
                   <TrendingUp className="w-5 h-5 text-primary flex-shrink-0" />
-                  <span>Cálculos em tempo real</span>
+                  <span>Cálculos em tempo real ilimitados</span>
                 </div>
                 <div className="flex items-center gap-3 text-left">
                   <Shield className="w-5 h-5 text-primary flex-shrink-0" />
-                  <span>Suporte prioritário</span>
+                  <span>Suporte prioritário via WhatsApp</span>
                 </div>
+                <div className="flex items-center gap-3 text-left">
+                  <Users className="w-5 h-5 text-primary flex-shrink-0" />
+                  <span>Gerenciamento de fornecedores</span>
+                </div>
+              </div>
+
+              <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 mb-8 max-w-md mx-auto">
+                <div className="text-4xl font-bold text-primary mb-2">R$ 99<span className="text-lg">/mês</span></div>
+                <p className="text-sm text-muted-foreground">Renovação mensal • Cancele quando quiser</p>
               </div>
 
               <Button 
                 size="lg" 
                 onClick={handleUpgrade}
-                className="text-lg px-8 py-6 shadow-3d hover:scale-105 transition-transform"
+                className="text-lg px-8 py-6 shadow-3d hover:scale-105 transition-transform btn-premium"
               >
-                <Sparkles className="w-5 h-5 mr-2" />
-                Fazer Upgrade Agora
+                <Crown className="w-5 h-5 mr-2" />
+                Assinar via WhatsApp
               </Button>
               
               <p className="text-sm text-muted-foreground mt-4">
-                A partir de R$ 49,90/mês
+                📱 Você será redirecionado para o WhatsApp para concluir o pagamento
               </p>
+              
+              <div className="mt-6 p-4 bg-card/50 rounded-lg text-sm text-muted-foreground">
+                <p><strong>Email cadastrado:</strong> {user?.email}</p>
+                <p className="mt-1">Use este email para confirmar sua identidade</p>
+              </div>
             </Card>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
