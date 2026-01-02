@@ -138,23 +138,23 @@ const Index = () => {
 
         {/* Hero Section Persuasivo */}
         <section className="container mx-auto px-6 py-16 text-center">
-          <div className="max-w-4xl mx-auto space-y-8 card-3d p-10 cascade-init animate-cascade-hero">
-            <Badge className="mb-4 gap-2 cascade-init animate-cascade-3d cascade-delay-2" variant="secondary">
+          <div className="max-w-4xl mx-auto space-y-8 card-3d p-10">
+            <Badge className="mb-4 gap-2 opacity-0 animate-hero-fade-up" variant="secondary" style={{ animationDelay: '0.1s' }}>
               <Zap className="w-4 h-4" />
               Tecnologia de IA Avançada
             </Badge>
             
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent cascade-init animate-title-cascade cascade-delay-3 pb-2">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent pb-2 opacity-0 animate-hero-slide-up" style={{ animationDelay: '0.2s' }}>
               Maximize Seus Lucros com Inteligência Artificial
             </h2>
             
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto cascade-init animate-cascade-3d cascade-delay-4">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto opacity-0 animate-hero-fade-up" style={{ animationDelay: '0.4s' }}>
               Análise em tempo real, decisões inteligentes e lucros maximizados. 
               A calculadora mais avançada do mercado agora ao seu alcance.
             </p>
 
             <div className="grid md:grid-cols-3 gap-6 mt-12">
-              <ParallaxCard className="p-6 cascade-init animate-cascade-glow cascade-delay-5">
+              <ParallaxCard className="p-6 opacity-0 animate-hero-scale-in" style={{ animationDelay: '0.5s' }}>
                 <TrendingUp className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-bold text-lg mb-2">Análise Instantânea</h3>
                 <p className="text-sm text-muted-foreground">
@@ -162,7 +162,7 @@ const Index = () => {
                 </p>
               </ParallaxCard>
               
-              <ParallaxCard className="p-6 cascade-init animate-cascade-glow cascade-delay-6">
+              <ParallaxCard className="p-6 opacity-0 animate-hero-scale-in" style={{ animationDelay: '0.65s' }}>
                 <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-bold text-lg mb-2">Decisões Seguras</h3>
                 <p className="text-sm text-muted-foreground">
@@ -170,7 +170,7 @@ const Index = () => {
                 </p>
               </ParallaxCard>
               
-              <ParallaxCard className="p-6 cascade-init animate-cascade-glow cascade-delay-7">
+              <ParallaxCard className="p-6 opacity-0 animate-hero-scale-in" style={{ animationDelay: '0.8s' }}>
                 <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h3 className="font-bold text-lg mb-2">Resultados 3D</h3>
                 <p className="text-sm text-muted-foreground">
