@@ -6,9 +6,10 @@ interface ParallaxCardProps {
   children: React.ReactNode;
   className?: string;
   intensity?: number;
+  style?: React.CSSProperties;
 }
 
-export const ParallaxCard = ({ children, className, intensity = 8 }: ParallaxCardProps) => {
+export const ParallaxCard = ({ children, className, intensity = 8, style }: ParallaxCardProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [transform, setTransform] = useState('');
 
@@ -41,7 +42,7 @@ export const ParallaxCard = ({ children, className, intensity = 8 }: ParallaxCar
         "transition-transform duration-200 ease-out will-change-transform",
         className
       )}
-      style={{ transform }}
+      style={{ ...style, transform: transform || style?.transform }}
     >
       {children}
     </Card>
