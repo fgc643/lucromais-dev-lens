@@ -90,7 +90,7 @@ const Index = () => {
     });
     // Open WhatsApp with pre-filled message
     const message = encodeURIComponent(`Olá! Gostaria de assinar o plano Premium do Lucro Mais IA por R$99/mês. Meu email de cadastro é: ${user?.email}`);
-    window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+    window.open(`https://wa.me/5511932071021?text=${message}`, '_blank');
   };
 
   const handleHistoryDelete = async (id: string) => {
