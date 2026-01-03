@@ -17,7 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
-import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown, Users, Search } from "lucide-react";
+import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown, Users, Search, Settings } from "lucide-react";
 import { GoldenParticles } from "@/components/GoldenParticles";
 import { SupplierManager } from "@/components/SupplierManager";
 import { SmartProductSearch } from "@/components/SmartProductSearch";
@@ -33,6 +33,7 @@ const Index = () => {
   const [isTrialExpired, setIsTrialExpired] = useState(false);
   const [isLoadingTrial, setIsLoadingTrial] = useState(true);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -42,8 +43,22 @@ const Index = () => {
 
     if (user) {
       checkTrialStatus();
+      checkAdminRole();
     }
   }, [user, authLoading, navigate]);
+
+  const checkAdminRole = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase.rpc("has_role", {
+        _user_id: user.id,
+        _role: "admin",
+      });
+      setIsAdmin(!!data);
+    } catch (error) {
+      console.error("Error checking admin role:", error);
+    }
+  };
 
   const checkTrialStatus = async () => {
     if (!user) return;
@@ -145,24 +160,37 @@ const Index = () => {
                 Lucro Mais IA
               </h1>
             </div>
-            {isSubscribed && (
-              <Badge variant="default" className="gap-2 px-4 py-2 bg-primary text-primary-foreground">
-                <Crown className="w-4 h-4" />
-                Premium Ativo
-              </Badge>
-            )}
-            {!isSubscribed && !isTrialExpired && trialDaysLeft !== null && (
-              <Badge variant="outline" className="gap-2 px-4 py-2 text-sm">
-                <Clock className="w-4 h-4" />
-                {trialDaysLeft} {trialDaysLeft === 1 ? 'dia restante' : 'dias restantes'}
-              </Badge>
-            )}
-            {!isSubscribed && isTrialExpired && (
-              <Badge variant="destructive" className="gap-2 px-4 py-2">
-                <Lock className="w-4 h-4" />
-                Acesso Bloqueado
-              </Badge>
-            )}
+            <div className="flex items-center gap-3">
+              {isAdmin && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => navigate("/admin")}
+                  className="gap-2"
+                >
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </Button>
+              )}
+              {isSubscribed && (
+                <Badge variant="default" className="gap-2 px-4 py-2 bg-primary text-primary-foreground">
+                  <Crown className="w-4 h-4" />
+                  Premium Ativo
+                </Badge>
+              )}
+              {!isSubscribed && !isTrialExpired && trialDaysLeft !== null && (
+                <Badge variant="outline" className="gap-2 px-4 py-2 text-sm">
+                  <Clock className="w-4 h-4" />
+                  {trialDaysLeft} {trialDaysLeft === 1 ? 'dia restante' : 'dias restantes'}
+                </Badge>
+              )}
+              {!isSubscribed && isTrialExpired && (
+                <Badge variant="destructive" className="gap-2 px-4 py-2">
+                  <Lock className="w-4 h-4" />
+                  Acesso Bloqueado
+                </Badge>
+              )}
+            </div>
           </div>
         </header>
 
