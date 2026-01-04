@@ -21,6 +21,8 @@ import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Cr
 import { GoldenParticles } from "@/components/GoldenParticles";
 import { SupplierManager } from "@/components/SupplierManager";
 import { SmartProductSearch } from "@/components/SmartProductSearch";
+import { MeliProductSearch } from "@/components/MeliProductSearch";
+
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -354,7 +356,14 @@ const Index = () => {
           )}
         </main>
 
-        {/* Seção de Busca Inteligente */}
+        {/* Seção de Busca Real - Mercado Livre */}
+        <section className="container mx-auto px-4 py-12">
+          <ParallaxCard className="cascade-init animate-cascade-glow">
+            <MeliProductSearch />
+          </ParallaxCard>
+        </section>
+
+        {/* Seção de Busca Inteligente com IA */}
         <section className="container mx-auto px-4 py-12">
           <ParallaxCard className="cascade-init animate-cascade-glow">
             <SmartProductSearch />
