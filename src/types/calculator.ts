@@ -9,6 +9,7 @@ export interface MarketplaceFees {
         pix: number;
       };
       shippingDiscount?: number;
+      fulfillmentFee?: number;
     };
   };
 }
