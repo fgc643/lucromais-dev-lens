@@ -6,6 +6,155 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Conhecimento específico por marketplace 2026
+const MARKETPLACE_COPYWRITING_2026 = `
+═══════════════════════════════════════════════════════════════
+📝 GUIA DE COPYWRITING POR MARKETPLACE - 2026
+═══════════════════════════════════════════════════════════════
+
+🟡 MERCADO LIVRE:
+TÍTULO (até 60 caracteres):
+- Use palavra-chave principal no início
+- Inclua modelo/marca/especificação
+- Evite caps lock excessivo
+- Exemplo: "iPhone 15 Pro Max 256GB Preto - Lacrado Original"
+
+DESCRIÇÃO:
+- Use a estrutura de ficha técnica
+- Bullets organizados
+- Inclua garantia e política de devolução
+- Perguntas frequentes no final
+
+PALAVRAS QUE VENDEM:
+- "Original", "Lacrado", "Pronta Entrega"
+- "Garantia", "Nota Fiscal", "Loja Oficial"
+- "Full" (frete grátis), "Envio Imediato"
+
+ALGORITMO 2026:
+- Relevância do título (40%)
+- Reputação do vendedor (25%)
+- Preço competitivo (20%)
+- Qualidade das fotos (15%)
+
+🟠 AMAZON:
+TÍTULO (até 200 caracteres):
+- Marca + Modelo + Características principais
+- Cor/Tamanho se aplicável
+- Exemplo: "Apple iPhone 15 Pro Max (256 GB) - Titânio Preto, Tela Super Retina XDR de 6,7", Chip A17 Pro"
+
+BULLETS (5 principais):
+- Um benefício por bullet
+- Comece com palavra de ação
+- Inclua especificações técnicas
+
+DESCRIÇÃO A+:
+- Use imagens e texto formatado
+- Conta a história do produto
+- Comparativos são permitidos
+
+PALAVRAS QUE VENDEM:
+- "Enviado por Amazon", "Prime"
+- "Bestseller", "Amazon's Choice"
+- "Garantia Amazon"
+
+BUY BOX:
+- Preço competitivo é CRUCIAL
+- Estoque disponível
+- Métricas de vendedor perfeitas
+
+🟧 SHOPEE:
+TÍTULO (até 100 caracteres):
+- Emojis permitidos e recomendados!
+- Palavras promocionais: "PROMOÇÃO", "OFERTA"
+- Exemplo: "🔥 iPhone 15 Pro Max 256GB ⭐ Lacrado + Nota Fiscal ✅ Envio 24h"
+
+DESCRIÇÃO:
+- Informal e direta
+- Use emojis liberalmente
+- Destaque cupons e cashback
+- Linguagem jovem
+
+PALAVRAS QUE VENDEM:
+- "Frete Grátis", "Cupom", "Cashback"
+- "Promoção Relâmpago", "Desconto"
+- "Loja Oficial", "Envio Rápido"
+
+LIVE COMMERCE:
+- 35% das vendas em 2026
+- Interação ao vivo aumenta conversão
+- Ofertas exclusivas na live
+
+🔵 MAGAZINE LUIZA:
+TÍTULO:
+- Profissional e direto
+- Modelo completo
+- Exemplo: "Smartphone Apple iPhone 15 Pro Max 256GB Titânio Preto"
+
+DESCRIÇÃO:
+- Foco em especificações técnicas
+- Comparativo com outros produtos
+- Condições de pagamento em destaque
+
+PALAVRAS QUE VENDEM:
+- "Retira em Loja", "Magalu Entrega"
+- "Parcele em até 24x"
+- "Produto Original Magalu"
+
+🔴 AMERICANAS:
+TÍTULO:
+- Similar ao Mercado Livre
+- Modelo + Especificações
+
+DESCRIÇÃO:
+- Estruturada com bullets
+- Condições de frete
+- Política de troca
+
+═══════════════════════════════════════════════════════════════
+🧠 GATILHOS MENTAIS AVANÇADOS 2026
+═══════════════════════════════════════════════════════════════
+
+1. ESCASSEZ INTELIGENTE:
+❌ Errado: "ÚLTIMAS UNIDADES!!!"
+✅ Certo: "Apenas 3 unidades disponíveis neste valor"
+
+2. URGÊNCIA AUTÊNTICA:
+❌ Errado: "CORRA! VAI ACABAR!"
+✅ Certo: "Oferta válida até hoje às 23h59"
+
+3. PROVA SOCIAL ESPECÍFICA:
+❌ Errado: "Milhares de clientes"
+✅ Certo: "Mais de 2.847 unidades vendidas este mês"
+
+4. AUTORIDADE DEMONSTRADA:
+❌ Errado: "Somos os melhores"
+✅ Certo: "8 anos no mercado • Loja verificada • 99% de avaliações positivas"
+
+5. RECIPROCIDADE REAL:
+❌ Errado: "Frete grátis"
+✅ Certo: "Frete grátis + Brinde exclusivo + Garantia estendida"
+
+6. COMPROMISSO PROGRESSIVO:
+❌ Errado: "Compre agora"
+✅ Certo: "Adicione ao carrinho e ganhe 10% de desconto na finalização"
+
+7. AFINIDADE E CONEXÃO:
+- Use linguagem do público-alvo
+- Referências culturais brasileiras
+- Mostre que entende a dor/necessidade
+
+═══════════════════════════════════════════════════════════════
+📊 TENDÊNCIAS DE COPY 2026
+═══════════════════════════════════════════════════════════════
+
+• IA TRANSPARENTE: Mencione quando IA ajudou (gera confiança)
+• SUSTENTABILIDADE: Selo verde/reciclável aumenta vendas 15%
+• VÍDEO > TEXTO: Video reviews convertem 2x mais
+• AUTENTICIDADE: Menos "perfeito", mais "real"
+• COMUNIDADE: "Faça parte dos 10.000 que já têm"
+• MICRO-INFLUENCIADORES: "Recomendado por @fulano"
+`;
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -19,107 +168,122 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY não configurada');
     }
 
-    const systemPrompt = `Você é um COPYWRITER PROFISSIONAL BRASILEIRO, especialista em vendas em marketplaces online.
+    const currentDate = new Date().toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
 
-⚠️ REGRA CRÍTICA - PORTUGUÊS PERFEITO:
-- Você DEVE escrever em português brasileiro IMPECÁVEL, sem NENHUM erro de ortografia ou gramática
-- NUNCA escreva palavras erradas como "BAÍSSIMO" - o correto é "BAIXÍSSIMO"
-- NUNCA use letras maiúsculas excessivas em palavras erradas
-- Revise CADA palavra antes de incluir no texto
-- Use acentuação correta: "últimas" (não "ultimas"), "promoção" (não "promocao")
-- Escreva de forma NATURAL e HUMANIZADA, como um vendedor experiente falaria
+    const systemPrompt = `Você é um COPYWRITER BRASILEIRO DE ELITE, especialista em vendas em marketplaces online com conhecimento atualizado de Janeiro de 2026.
 
-🎯 ESTILO DE ESCRITA HUMANIZADO:
-- Escreva como se estivesse conversando com o cliente
-- Use frases naturais e fluidas, não robóticas
-- Evite exageros artificiais - seja persuasivo mas autêntico
-- Prefira linguagem acessível e clara
-- Crie conexão emocional genuína
+${MARKETPLACE_COPYWRITING_2026}
 
-🧠 GATILHOS MENTAIS (use com naturalidade):
+📅 Data: ${currentDate}
+🛒 Marketplace alvo: ${marketplace || 'Geral'}
 
-1. ESCASSEZ - Transmita raridade de forma elegante:
-- "Poucas unidades disponíveis"
-- "Estoque limitado"
-- "Últimas peças"
+⚠️ REGRAS CRÍTICAS:
 
-2. URGÊNCIA - Crie senso de oportunidade:
-- "Oferta por tempo limitado"
-- "Aproveite enquanto disponível"
-- "Condição especial válida hoje"
+1. PORTUGUÊS BRASILEIRO IMPECÁVEL:
+   - Zero erros de ortografia ou gramática
+   - Acentuação correta sempre
+   - Palavras com grafia correta (BAIXÍSSIMO, não "baissimo")
 
-3. PROVA SOCIAL - Mostre credibilidade:
-- "Milhares de clientes satisfeitos"
-- "Avaliações positivas"
-- "Produto mais vendido"
+2. COPYWRITING HUMANIZADO:
+   - Escreva como um vendedor experiente falaria
+   - Natural, fluido, persuasivo mas autêntico
+   - Evite clichês robóticos de IA
 
-4. AUTORIDADE - Transmita confiança:
-- "Qualidade garantida"
-- "Marca de confiança"
-- "Padrão de excelência"
+3. ADAPTAÇÃO AO MARKETPLACE:
+   ${marketplace === 'Mercado Livre' ? '- Título até 60 chars, formato profissional' : ''}
+   ${marketplace === 'Shopee' ? '- Use emojis! Linguagem jovem e promocional' : ''}
+   ${marketplace === 'Amazon' ? '- Formato técnico, bullets claros' : ''}
+   ${marketplace === 'Magazine Luiza' ? '- Profissional, foco em parcelamento' : ''}
+   - Adapte o tom e formato ao marketplace escolhido
 
-5. RECIPROCIDADE - Ofereça valor:
-- "Frete grátis incluso"
-- "Bônus especial"
-- "Garantia estendida"
+4. GATILHOS MENTAIS SUTIS:
+   - Use escassez e urgência de forma elegante
+   - Prova social com números específicos
+   - Autoridade demonstrada, não afirmada
+   - Reciprocidade real (brindes, garantias)
 
-6. COMPROMISSO - Reduza riscos:
-- "Satisfação garantida"
-- "Devolução sem complicação"
-- "Compra segura"
+5. CALL TO ACTION EFICAZ:
+   - Específico para o marketplace
+   - Urgência sem desespero
+   - Benefício claro na ação
 
-7. CONEXÃO EMOCIONAL - Humanize:
-- Use linguagem calorosa
-- Fale dos benefícios para a vida do cliente
-- Mostre que você entende as necessidades dele
+🎯 ESTRUTURA DO ANÚNCIO:
 
-📝 REGRAS DE COPYWRITING:
-- Transforme características em BENEFÍCIOS reais
-- Use palavras de impacto: Grátis, Novo, Exclusivo, Você, Agora
-- Números específicos geram credibilidade (97%, 3x mais rápido)
-- Emojis estratégicos para destacar pontos importantes
-- Frases curtas e objetivas
-- Adapte o tom ao marketplace (${'' /* será preenchido */})
+VERSÃO A (Escassez + Urgência):
+- Foco em oportunidade limitada
+- "Últimas unidades", "Oferta por tempo limitado"
+- CTA: Ação imediata
 
-🔄 GERE 2 VERSÕES PARA TESTE A/B:
-- Versão A: Foco em ESCASSEZ + URGÊNCIA (criar senso de oportunidade)
-- Versão B: Foco em PROVA SOCIAL + AUTORIDADE (criar confiança)
+VERSÃO B (Prova Social + Autoridade):
+- Foco em credibilidade
+- "X clientes satisfeitos", "Loja verificada"
+- CTA: Confiança na escolha
 
-Responda APENAS em formato JSON válido.`;
+Responda APENAS em JSON válido.`;
 
-    const userPrompt = `Crie 2 anúncios persuasivos e HUMANIZADOS para este produto:
+    const userPrompt = `Crie 2 anúncios PROFISSIONAIS e PERSUASIVOS para:
 
 📦 PRODUTO: ${productName}
-📂 CATEGORIA: ${category}  
-🛒 MARKETPLACE: ${marketplace}
+📂 CATEGORIA: ${category}
+🛒 MARKETPLACE: ${marketplace || 'Geral'}
 💰 PREÇO: R$ ${salePrice?.toFixed(2) || '0,00'}
+${costPrice ? `💵 CUSTO: R$ ${costPrice.toFixed(2)}` : ''}
 ${features ? `✨ CARACTERÍSTICAS: ${features}` : ''}
 
-IMPORTANTE:
-- Português brasileiro PERFEITO, sem erros de ortografia
-- Texto natural e humanizado, como um vendedor experiente
-- Persuasivo mas autêntico, sem exageros artificiais
-- Use os gatilhos mentais de forma sutil e eficaz
+REQUISITOS:
+1. Português brasileiro PERFEITO
+2. Adapte ao estilo do ${marketplace || 'marketplace'}
+3. Use gatilhos mentais de forma natural
+4. Títulos que capturam atenção
+5. Descrições que vendem
+6. CTAs que convertem
 
-Responda no formato JSON:
+JSON OBRIGATÓRIO:
 {
   "versaoA": {
-    "titulo": "título persuasivo com escassez (máximo 60 caracteres)",
-    "subtitulo": "subtítulo complementar (máximo 80 caracteres)",
-    "descricao": "3 parágrafos naturais focando benefícios e transformação",
-    "bullets": ["benefício 1 com emoji", "benefício 2 com emoji", "benefício 3 com emoji", "benefício 4 com emoji"],
-    "callToAction": "chamada para ação convincente",
+    "titulo": "título persuasivo (respeitar limite do marketplace)",
+    "subtitulo": "complemento que gera interesse",
+    "descricao": "3 parágrafos: abertura impactante, benefícios/transformação, fechamento com urgência",
+    "bullets": [
+      "✅ Benefício 1 com prova",
+      "🚀 Benefício 2 com resultado",
+      "🔒 Benefício 3 com garantia",
+      "⭐ Benefício 4 com diferencial",
+      "🎁 Benefício 5 com bônus"
+    ],
+    "callToAction": "CTA com urgência elegante",
     "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
-    "gatilhos": ["escassez", "urgência"]
+    "gatilhos": ["escassez", "urgência"],
+    "seoKeywords": ["keyword1", "keyword2", "keyword3"],
+    "hashtagsRedes": ["#hash1", "#hash2", "#hash3"]
   },
   "versaoB": {
-    "titulo": "título com prova social (máximo 60 caracteres)",
-    "subtitulo": "subtítulo diferente (máximo 80 caracteres)",
-    "descricao": "3 parágrafos focando credibilidade e confiança",
-    "bullets": ["benefício 1 com emoji", "benefício 2 com emoji", "benefício 3 com emoji", "benefício 4 com emoji"],
-    "callToAction": "chamada para ação diferente",
+    "titulo": "título com prova social",
+    "subtitulo": "complemento com autoridade",
+    "descricao": "3 parágrafos: credibilidade, resultados, confiança",
+    "bullets": [
+      "⭐ Benefício 1 com avaliação",
+      "🏆 Benefício 2 com conquista",
+      "👥 Benefício 3 com comunidade",
+      "✅ Benefício 4 com verificação",
+      "🛡️ Benefício 5 com segurança"
+    ],
+    "callToAction": "CTA com confiança",
     "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
-    "gatilhos": ["prova_social", "autoridade"]
+    "gatilhos": ["prova_social", "autoridade"],
+    "seoKeywords": ["keyword1", "keyword2", "keyword3"],
+    "hashtagsRedes": ["#hash1", "#hash2", "#hash3"]
+  },
+  "dicasExtras": {
+    "melhorHorarioPostar": "horários com maior engajamento",
+    "formatoFoto": "dicas para fotos que vendem",
+    "videoSugestao": "sugestão de vídeo curto",
+    "respostasProntas": ["resposta FAQ 1", "resposta FAQ 2"]
   }
 }`;
 
@@ -137,6 +301,8 @@ Responda no formato JSON:
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
+        temperature: 0.8,
+        max_tokens: 4000,
       }),
     });
 
@@ -169,7 +335,6 @@ Responda no formato JSON:
     // Extrair JSON da resposta
     let adData;
     try {
-      // Tentar extrair JSON do conteúdo
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         adData = JSON.parse(jsonMatch[0]);
@@ -180,17 +345,19 @@ Responda no formato JSON:
       console.error('Erro ao parsear JSON:', parseError, content);
       // Retornar resposta raw com estrutura A/B
       const fallbackAd = {
-        titulo: `${productName} - Últimas Unidades Disponíveis`,
-        subtitulo: `O melhor ${category} do ${marketplace} com condição especial`,
+        titulo: `${productName} - Oferta Especial`,
+        subtitulo: `O melhor ${category} do ${marketplace || 'mercado'}`,
         descricao: content,
-        bullets: ['✅ Qualidade Premium Garantida', '🚀 Entrega Rápida e Segura', '🔒 Compra 100% Protegida', '⭐ Avaliações Positivas'],
-        callToAction: 'Garanta o Seu Agora - Estoque Limitado',
-        tags: [category, marketplace, 'oferta', 'promoção', 'qualidade'],
-        gatilhos: ['escassez', 'urgência']
+        bullets: ['✅ Qualidade Premium', '🚀 Entrega Rápida', '🔒 Compra Segura', '⭐ Alta Avaliação', '🎁 Brinde Exclusivo'],
+        callToAction: 'Garanta Já o Seu',
+        tags: [category, marketplace || 'oferta', 'promoção', 'qualidade', 'original'],
+        gatilhos: ['escassez', 'urgência'],
+        seoKeywords: [productName, category, 'comprar'],
+        hashtagsRedes: [`#${category}`, '#oferta', '#promocao']
       };
       adData = {
         versaoA: fallbackAd,
-        versaoB: { ...fallbackAd, titulo: `${productName} - Escolha de Milhares de Clientes`, gatilhos: ['prova_social', 'autoridade'] }
+        versaoB: { ...fallbackAd, titulo: `${productName} - Escolha de Milhares`, gatilhos: ['prova_social', 'autoridade'] }
       };
     }
 

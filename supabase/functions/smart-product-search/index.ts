@@ -6,11 +6,73 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface SearchResult {
-  marketplace: string;
-  products: ProductResult[];
-  timestamp: string;
-}
+// Base de conhecimento de marketplaces 2026
+const MARKETPLACE_KNOWLEDGE_2026 = `
+═══════════════════════════════════════════════════════════════
+📊 DADOS DE REFERÊNCIA DOS MARKETPLACES - JANEIRO 2026
+═══════════════════════════════════════════════════════════════
+
+🟡 MERCADO LIVRE:
+- Maior marketplace do Brasil (65% do mercado)
+- Frete grátis acima de R$ 79 (Full)
+- Comissões: 11% a 19% dependendo da categoria
+- Mercado Pago: 4.49% cartão, 3.99% PIX
+- Parcelamento: até 18x
+
+🟠 AMAZON BRASIL:
+- Segundo maior marketplace
+- Prime: Frete grátis e entrega rápida
+- Comissões: 8% a 17%
+- Buy Box define visibilidade
+- FBA disponível para logística
+
+🟧 SHOPEE:
+- Foco em preço baixo
+- Frete grátis acima de R$ 29
+- Comissões: 14% a 20%
+- Muito cashback e cupons
+- Lives e gamificação
+
+🔵 MAGAZINE LUIZA:
+- Forte presença física (1000+ lojas)
+- Retira em loja grátis
+- Comissões: 12% a 22%
+- Magalu Entregas próprio
+
+🔴 AMERICANAS:
+- Tradicional no e-commerce BR
+- Comissões: 16% a 20%
+- Integração B2W
+- Lojas físicas para retirada
+
+🟢 CASAS BAHIA:
+- Foco em móveis e eletro
+- Carnê digital
+- Comissões: 12% a 19%
+- Via Varejo ecossistema
+
+═══════════════════════════════════════════════════════════════
+📦 REFERÊNCIA DE FRETE 2026 (CORREIOS/TRANSPORTADORAS)
+═══════════════════════════════════════════════════════════════
+• Produtos até 300g: R$ 15 a R$ 25
+• Produtos 300g-1kg: R$ 25 a R$ 45
+• Produtos 1kg-5kg: R$ 40 a R$ 80
+• Produtos 5kg-10kg: R$ 70 a R$ 150
+• Produtos 10kg+: R$ 100 a R$ 300+
+
+MINI ENVIOS (até 300g, fino): R$ 12 a R$ 18
+SEDEX: +50% a +80% sobre PAC
+FULL/FBA: Geralmente incluso no preço
+
+═══════════════════════════════════════════════════════════════
+💳 PARCELAMENTO TÍPICO 2026
+═══════════════════════════════════════════════════════════════
+• 1x: Preço à vista
+• 3x: Sem juros (absorvido pelo vendedor ~2%)
+• 6x: Sem juros (absorvido ~4%)
+• 10x: Sem juros (absorvido ~6%)
+• 12x: Com/sem juros dependendo do marketplace
+`;
 
 interface ProductResult {
   name: string;
@@ -23,7 +85,11 @@ interface ProductResult {
   rating?: string;
   reviews?: string;
   shipping?: string;
+  shippingDays?: string;
   specifications?: string[];
+  condition?: string;
+  warranty?: string;
+  installments?: string;
 }
 
 serve(async (req) => {
@@ -61,70 +127,116 @@ serve(async (req) => {
       minute: '2-digit'
     });
 
-    const systemPrompt = `Você é um especialista em pesquisa de produtos nos principais marketplaces brasileiros. 
-Sua função é fornecer informações REAIS e ATUALIZADAS sobre produtos.
+    const systemPrompt = `Você é um ESPECIALISTA EM PESQUISA DE MERCADO BRASILEIRO com acesso aos dados mais atualizados de Janeiro de 2026.
 
-Data e hora atual: ${currentDate}
+${MARKETPLACE_KNOWLEDGE_2026}
 
-IMPORTANTE: Você deve simular uma busca real nos seguintes marketplaces:
-- Mercado Livre
-- Amazon Brasil
-- Shopee Brasil
-- Magazine Luiza
-- Americanas
-- Casas Bahia
+📅 Data atual: ${currentDate}
 
-Para cada marketplace, forneça:
-1. Nome completo do produto
-2. Preço atual (em R$)
-3. Preço original (se houver desconto)
-4. Percentual de desconto
-5. URL de imagem do produto (use placeholders realistas como https://images.unsplash.com para produtos)
-6. Nome do vendedor
-7. Avaliação (estrelas)
-8. Número de avaliações
-9. Informações de frete
-10. Especificações principais
+🎯 SUA MISSÃO:
+Simular uma pesquisa REALISTA de produtos nos principais marketplaces brasileiros, retornando dados que refletem preços, condições e ofertas REAIS do mercado atual.
 
-RETORNE APENAS JSON VÁLIDO no seguinte formato:
+📋 REGRAS PARA GERAÇÃO DE DADOS:
+
+1. PREÇOS REALISTAS:
+   - Base seus preços em valores reais do mercado brasileiro 2026
+   - Considere inflação e tendências de preço
+   - Varie os preços entre marketplaces (Amazon geralmente mais caro, Shopee mais barato)
+   - Descontos realistas: 5% a 40% (não 90%)
+
+2. VENDEDORES:
+   - Use nomes de vendedores típicos brasileiros
+   - Misture lojas oficiais com sellers
+   - Algumas lojas conhecidas: Loja Oficial [Marca], Tech Store, Mega Eletrônicos, Casa Digital, etc.
+
+3. AVALIAÇÕES:
+   - Ratings entre 3.8 e 5.0
+   - Número de reviews proporcional ao marketplace
+   - ML/Amazon: milhares de reviews
+   - Shopee: centenas a milhares
+   - Magalu/Americanas: centenas
+
+4. FRETE:
+   - Variar entre "Frete grátis", "R$ X,XX", "Consulte"
+   - Full/Prime sempre grátis para valores acima do mínimo
+   - Prazos: 1-15 dias úteis dependendo do serviço
+
+5. ESPECIFICAÇÕES:
+   - 3-5 specs relevantes para o produto
+   - Dados técnicos quando aplicável
+
+6. IMAGENS:
+   - Use URLs de placeholder: https://images.unsplash.com/photo-[ID]?w=400&h=400
+   - IDs realistas de fotos de produtos
+
+RESPONDA APENAS EM JSON com estrutura:
 {
-  "searchQuery": "termo buscado",
-  "timestamp": "data/hora da busca",
+  "searchQuery": "termo",
+  "timestamp": "${currentDate}",
   "totalResults": número,
   "marketplaces": [
     {
-      "name": "Nome do Marketplace",
-      "logo": "emoji do marketplace",
+      "name": "Nome Marketplace",
+      "logo": "emoji",
+      "totalProducts": número,
+      "priceRange": "R$ X a R$ Y",
       "products": [
         {
-          "name": "Nome do Produto",
-          "price": "R$ 999,99",
-          "originalPrice": "R$ 1.299,99",
-          "discount": "23%",
-          "image": "https://images.unsplash.com/photo-...",
+          "name": "Nome completo do produto",
+          "price": "R$ X.XXX,XX",
+          "originalPrice": "R$ X.XXX,XX",
+          "discount": "XX%",
+          "image": "https://images.unsplash.com/...",
           "url": "https://marketplace.com/produto",
           "seller": "Nome do Vendedor",
-          "rating": "4.8",
-          "reviews": "1.234",
-          "shipping": "Frete grátis",
-          "specifications": ["Especificação 1", "Especificação 2"]
+          "sellerRating": "X.X",
+          "rating": "X.X",
+          "reviews": "X.XXX",
+          "shipping": "Frete grátis / R$ XX,XX",
+          "shippingDays": "X-X dias úteis",
+          "condition": "Novo/Usado",
+          "warranty": "X meses",
+          "installments": "Até Xx de R$ XX,XX sem juros",
+          "specifications": ["spec1", "spec2", "spec3"],
+          "badges": ["Full", "Prime", "Mais Vendido", "Frete Grátis"]
         }
       ]
     }
   ],
   "insights": {
-    "lowestPrice": "R$ XXX",
+    "lowestPrice": "R$ X.XXX,XX",
     "lowestPriceMarketplace": "Nome",
-    "averagePrice": "R$ XXX",
+    "lowestPriceProduct": "Nome do produto",
+    "highestPrice": "R$ X.XXX,XX",
+    "averagePrice": "R$ X.XXX,XX",
+    "priceVariation": "XX%",
     "bestRated": "Nome do produto",
-    "recommendation": "Texto com recomendação"
+    "bestRatedMarketplace": "Nome",
+    "bestValue": "Nome do produto (melhor custo-benefício)",
+    "recommendation": "Análise detalhada de onde comprar e por quê",
+    "savingsOpportunity": "Economia potencial de R$ X ao comprar no marketplace X",
+    "marketTrend": "tendência de preço (subindo/estável/caindo)",
+    "bestTimeToBy": "Dica de quando comprar"
+  },
+  "relatedSearches": ["busca relacionada 1", "busca relacionada 2"],
+  "priceHistory": {
+    "trend": "subindo/estável/descendo",
+    "lastMonth": "R$ X.XXX,XX (média)",
+    "prediction": "Texto sobre previsão"
   }
 }`;
 
-    const userPrompt = `Busque informações sobre: "${searchQuery}"${category ? ` na categoria: ${category}` : ''}
+    const userPrompt = `Busque informações DETALHADAS e REALISTAS sobre: "${searchQuery}"${category ? ` na categoria: ${category}` : ''}
 
-Retorne pelo menos 2-3 produtos de cada marketplace com dados realistas baseados em preços típicos do mercado brasileiro.
-Inclua variações de preço entre os marketplaces e diferentes vendedores.`;
+IMPORTANTE:
+1. Retorne 3-4 produtos de cada marketplace principal (Mercado Livre, Amazon, Shopee, Magazine Luiza, Americanas)
+2. Preços devem refletir o mercado brasileiro de Janeiro 2026
+3. Varie preços entre marketplaces (diferença de 5% a 30%)
+4. Inclua produtos de diferentes faixas de preço
+5. Dados de frete realistas
+6. Avaliações e reviews proporcionais
+
+Retorne APENAS o JSON estruturado, sem texto adicional.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -139,7 +251,7 @@ Inclua variações de preço entre os marketplaces e diferentes vendedores.`;
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.7,
-        max_tokens: 4000,
+        max_tokens: 6000,
       }),
     });
 
