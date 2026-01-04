@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { ProductData } from "@/types/calculator";
 import { ProductForm } from "@/components/ProductForm";
@@ -36,6 +36,15 @@ const Index = () => {
   const [isLoadingTrial, setIsLoadingTrial] = useState(true);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile on mount
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -138,17 +147,17 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-[hsl(225,25%,3%)] relative overflow-x-hidden">
-      {/* Golden Particles Effect */}
-      <GoldenParticles />
+      {/* Golden Particles Effect - Only on desktop */}
+      {!isMobile && <GoldenParticles />}
       
-      {/* Background Premium Effects - Simplified for performance */}
+      {/* Background Premium Effects - Simplified for mobile */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[hsl(42,100%,50%,0.06)] rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-[hsl(280,60%,50%,0.04)] rounded-full blur-[120px]"></div>
+        <div className={`absolute top-0 left-1/4 rounded-full ${isMobile ? 'w-[200px] h-[200px] blur-[50px]' : 'w-[400px] h-[400px] blur-[80px]'} bg-[hsl(42,100%,50%,0.04)]`}></div>
+        <div className={`absolute bottom-0 right-1/4 rounded-full ${isMobile ? 'w-[250px] h-[250px] blur-[60px]' : 'w-[500px] h-[500px] blur-[100px]'} bg-[hsl(280,60%,50%,0.03)]`}></div>
       </div>
 
-      {/* Mesh Gradient Overlay */}
-      <div className="absolute inset-0 bg-mesh pointer-events-none"></div>
+      {/* Mesh Gradient Overlay - Hidden on mobile for performance */}
+      {!isMobile && <div className="absolute inset-0 bg-mesh pointer-events-none"></div>}
 
       <div className="relative z-10">
         <OnboardingTutorial />

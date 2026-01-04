@@ -161,33 +161,41 @@
 }
 
 /* ============================================
-   ANIMAÇÕES 3D DE ÚLTIMA GERAÇÃO
+   ANIMAÇÕES OTIMIZADAS PARA PERFORMANCE
    ============================================ */
+
+/* Respeitar preferência de movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
+/* Animações mais leves - sem transform scale para evitar tremor */
 @keyframes pulse-gold {
   0%, 100% { 
-    box-shadow: 0 0 20px hsl(42 100% 50% / 0.4), 0 0 40px hsl(42 100% 50% / 0.2);
+    box-shadow: 0 0 15px hsl(42 100% 50% / 0.3);
   }
   50% { 
-    box-shadow: 0 0 40px hsl(42 100% 50% / 0.6), 0 0 80px hsl(42 100% 50% / 0.4);
+    box-shadow: 0 0 25px hsl(42 100% 50% / 0.5);
   }
 }
 
 @keyframes float-3d {
-  0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); }
-  25% { transform: translateY(-5px) rotateX(2deg) rotateY(1deg); }
-  50% { transform: translateY(-10px) rotateX(0) rotateY(-1deg); }
-  75% { transform: translateY(-5px) rotateX(-2deg) rotateY(1deg); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
 @keyframes glow-pulse {
-  0%, 100% { opacity: 0.5; filter: blur(20px); }
-  50% { opacity: 1; filter: blur(30px); }
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
 }
 
 @keyframes text-shine {
@@ -197,76 +205,35 @@
 
 @keyframes border-glow {
   0%, 100% { border-color: hsl(42 100% 50% / 0.3); }
-  50% { border-color: hsl(42 100% 50% / 0.8); }
+  50% { border-color: hsl(42 100% 50% / 0.6); }
 }
 
+/* Profit/Loss - removido scale para evitar tremor */
 @keyframes profit-pulse {
   0%, 100% { 
-    box-shadow: 0 0 30px hsl(145 85% 45% / 0.5), 0 0 60px hsl(145 85% 50% / 0.3);
-    transform: scale(1);
+    box-shadow: 0 0 20px hsl(145 85% 45% / 0.4);
   }
   50% { 
-    box-shadow: 0 0 50px hsl(145 85% 45% / 0.7), 0 0 100px hsl(145 85% 50% / 0.5);
-    transform: scale(1.02);
+    box-shadow: 0 0 30px hsl(145 85% 45% / 0.6);
   }
 }
 
 @keyframes loss-pulse {
   0%, 100% { 
-    box-shadow: 0 0 30px hsl(0 90% 55% / 0.5), 0 0 60px hsl(0 90% 60% / 0.3);
-    transform: scale(1);
+    box-shadow: 0 0 20px hsl(0 90% 55% / 0.4);
   }
   50% { 
-    box-shadow: 0 0 50px hsl(0 90% 55% / 0.7), 0 0 100px hsl(0 90% 60% / 0.5);
-    transform: scale(1.02);
+    box-shadow: 0 0 30px hsl(0 90% 55% / 0.6);
   }
 }
 
 @keyframes slide-up-fade {
-  from { opacity: 0; transform: translateY(30px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes rotate-3d {
-  from { transform: rotateY(0deg); }
-  to { transform: rotateY(360deg); }
-}
-
-/* ANIMAÇÕES 3D EM CASCATA - OTIMIZADAS */
+/* ANIMAÇÕES EM CASCATA - SIMPLIFICADAS */
 @keyframes cascade-3d-in {
-  0% {
-    opacity: 0;
-    transform: translateY(40px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes cascade-hero-in {
-  0% {
-    opacity: 0;
-    transform: translateY(60px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes cascade-glow-in {
-  0% {
-    opacity: 0;
-    transform: translateY(30px) scale(0.9);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes title-cascade-in {
   0% {
     opacity: 0;
     transform: translateY(20px);
@@ -277,10 +244,43 @@
   }
 }
 
+@keyframes cascade-hero-in {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cascade-glow-in {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes title-cascade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes stats-cascade-in {
   0% {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-10px);
   }
   100% {
     opacity: 1;
@@ -293,15 +293,14 @@
    ============================================ */
 
 @layer utilities {
-  /* === CARDS 3D OTIMIZADOS === */
+  /* === CARDS OTIMIZADOS === */
   .card-premium {
     background: linear-gradient(145deg, hsl(225 20% 10%) 0%, hsl(225 25% 6%) 100%);
     border: 1px solid hsl(42 30% 20% / 0.5);
-    box-shadow: 0 15px 40px -15px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
     position: relative;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    will-change: transform;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
   .card-premium::before {
@@ -314,21 +313,25 @@
     background: linear-gradient(90deg, transparent, hsl(42 100% 50% / 0.5), transparent);
   }
 
-  .card-premium:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 50px -15px hsl(42 100% 50% / 0.3);
+  @media (hover: hover) {
+    .card-premium:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px -10px hsl(42 100% 50% / 0.2);
+    }
   }
 
   .card-3d {
-    will-change: transform;
+    /* Removed will-change to prevent layer creation overhead */
   }
 
   .card-3d-content {
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
   }
 
-  .card-3d:hover .card-3d-content {
-    transform: translateY(-2px);
+  @media (hover: hover) {
+    .card-3d:hover .card-3d-content {
+      transform: translateY(-2px);
+    }
   }
 
   /* === TEXTO PREMIUM DOURADO === */
@@ -355,52 +358,43 @@
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   }
 
-  /* === PROFIT/LOSS ULTRA VIBRANTES === */
+  /* === PROFIT/LOSS OTIMIZADOS === */
   .profit-glow {
-    background: linear-gradient(135deg, hsl(145 85% 45% / 0.15) 0%, hsl(145 80% 35% / 0.08) 100%);
-    border: 2px solid hsl(145 85% 45% / 0.5);
-    box-shadow: var(--shadow-profit-glow);
+    background: linear-gradient(135deg, hsl(145 85% 45% / 0.12) 0%, hsl(145 80% 35% / 0.06) 100%);
+    border: 2px solid hsl(145 85% 45% / 0.4);
+    box-shadow: 0 0 20px hsl(145 85% 45% / 0.3);
     position: relative;
-    animation: profit-pulse 3s ease-in-out infinite;
   }
 
-  .profit-glow::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, hsl(145 85% 50% / 0.3), transparent);
-    z-index: -1;
-    filter: blur(15px);
+  /* Animação apenas no hover para poupar recursos */
+  @media (hover: hover) {
+    .profit-glow:hover {
+      animation: profit-pulse 2s ease-in-out infinite;
+    }
   }
 
   .loss-glow {
-    background: linear-gradient(135deg, hsl(0 90% 55% / 0.15) 0%, hsl(0 85% 45% / 0.08) 100%);
-    border: 2px solid hsl(0 90% 55% / 0.5);
-    box-shadow: var(--shadow-loss-glow);
+    background: linear-gradient(135deg, hsl(0 90% 55% / 0.12) 0%, hsl(0 85% 45% / 0.06) 100%);
+    border: 2px solid hsl(0 90% 55% / 0.4);
+    box-shadow: 0 0 20px hsl(0 90% 55% / 0.3);
     position: relative;
-    animation: loss-pulse 3s ease-in-out infinite;
   }
 
-  .loss-glow::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    background: linear-gradient(135deg, hsl(0 90% 60% / 0.3), transparent);
-    z-index: -1;
-    filter: blur(15px);
+  @media (hover: hover) {
+    .loss-glow:hover {
+      animation: loss-pulse 2s ease-in-out infinite;
+    }
   }
 
   .text-profit {
     color: hsl(145 90% 55%);
-    text-shadow: 0 0 30px hsl(145 85% 50% / 0.8), 0 0 60px hsl(145 85% 50% / 0.4);
+    text-shadow: 0 0 15px hsl(145 85% 50% / 0.6);
     font-weight: 800;
   }
 
   .text-loss {
     color: hsl(0 95% 60%);
-    text-shadow: 0 0 30px hsl(0 90% 55% / 0.8), 0 0 60px hsl(0 90% 55% / 0.4);
+    text-shadow: 0 0 15px hsl(0 90% 55% / 0.6);
     font-weight: 800;
   }
 
@@ -486,44 +480,41 @@
   }
 
   .glow-gold {
-    box-shadow: 0 0 20px hsl(42 100% 50% / 0.4);
+    box-shadow: 0 0 15px hsl(42 100% 50% / 0.3);
   }
 
-  .float-3d {
-    animation: float-3d 8s ease-in-out infinite;
-    will-change: transform;
+  /* Float apenas no desktop e sob demanda */
+  @media (hover: hover) and (min-width: 768px) {
+    .float-3d:hover {
+      animation: float-3d 4s ease-in-out infinite;
+    }
   }
 
   .shimmer {
-    background: linear-gradient(90deg, transparent 0%, hsl(42 100% 50% / 0.08) 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, hsl(42 100% 50% / 0.06) 50%, transparent 100%);
     background-size: 200% 100%;
-    animation: shimmer 3s infinite;
+    animation: shimmer 4s infinite;
   }
 
-  /* === ANIMAÇÕES DE ENTRADA EM CASCATA - OTIMIZADAS === */
+  /* === ANIMAÇÕES DE ENTRADA EM CASCATA === */
   .animate-cascade-3d {
-    animation: cascade-3d-in 0.5s ease-out forwards;
-    will-change: opacity, transform;
+    animation: cascade-3d-in 0.4s ease-out forwards;
   }
 
   .animate-cascade-hero {
-    animation: cascade-hero-in 0.6s ease-out forwards;
-    will-change: opacity, transform;
+    animation: cascade-hero-in 0.5s ease-out forwards;
   }
 
   .animate-cascade-glow {
-    animation: cascade-glow-in 0.5s ease-out forwards;
-    will-change: opacity, transform;
+    animation: cascade-glow-in 0.4s ease-out forwards;
   }
 
   .animate-title-cascade {
-    animation: title-cascade-in 0.5s ease-out forwards;
-    will-change: opacity, transform;
+    animation: title-cascade-in 0.4s ease-out forwards;
   }
 
   .animate-stats-cascade {
-    animation: stats-cascade-in 0.4s ease-out forwards;
-    will-change: opacity, transform;
+    animation: stats-cascade-in 0.3s ease-out forwards;
   }
 
   /* Delays para efeito cascata */
