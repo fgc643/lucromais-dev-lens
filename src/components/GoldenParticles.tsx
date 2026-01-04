@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 interface Particle {
   x: number;
@@ -15,16 +15,30 @@ export const GoldenParticles = () => {
   const particlesRef = useRef<Particle[]>([]);
   const animationRef = useRef<number>();
   const lastTimeRef = useRef<number>(0);
+  const [isVisible, setIsVisible] = useState(true);
+
+  // Check for reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' 
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+    : false;
 
   const animate = useCallback((timestamp: number) => {
+    if (!isVisible || prefersReducedMotion) {
+      animationRef.current = requestAnimationFrame(animate);
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Throttle to 30fps for better performance
-    if (timestamp - lastTimeRef.current < 33) {
+    // Throttle to 20fps on mobile, 30fps on desktop for better performance
+    const isMobile = window.innerWidth < 768;
+    const frameInterval = isMobile ? 50 : 33; // 20fps or 30fps
+    
+    if (timestamp - lastTimeRef.current < frameInterval) {
       animationRef.current = requestAnimationFrame(animate);
       return;
     }
@@ -50,45 +64,83 @@ export const GoldenParticles = () => {
     });
 
     animationRef.current = requestAnimationFrame(animate);
-  }, []);
+  }, [isVisible, prefersReducedMotion]);
 
   useEffect(() => {
+    // Skip entirely on mobile for performance or if reduced motion is preferred
+    const isMobile = window.innerWidth < 768;
+    if (prefersReducedMotion) {
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.scale(dpr, dpr);
+      }
     };
 
     resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
+    
+    // Debounced resize handler
+    let resizeTimeout: number;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = window.setTimeout(resizeCanvas, 150);
+    };
+    
+    window.addEventListener('resize', handleResize, { passive: true });
 
-    // Reduced particle count for performance
-    const particleCount = Math.min(25, Math.floor(window.innerWidth / 60));
+    // Much fewer particles: 8-12 on mobile, 12-20 on desktop
+    const particleCount = isMobile 
+      ? Math.min(8, Math.floor(window.innerWidth / 100))
+      : Math.min(15, Math.floor(window.innerWidth / 80));
+    
     particlesRef.current = [];
 
     for (let i = 0; i < particleCount; i++) {
       particlesRef.current.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 2 + 1,
-        speedX: (Math.random() - 0.5) * 0.3,
-        speedY: -Math.random() * 0.3 - 0.1,
-        opacity: Math.random() * 0.4 + 0.2,
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        size: Math.random() * 1.5 + 0.5, // Smaller particles
+        speedX: (Math.random() - 0.5) * 0.2, // Slower movement
+        speedY: -Math.random() * 0.2 - 0.05,
+        opacity: Math.random() * 0.3 + 0.15, // Lower opacity
         hue: 38 + Math.random() * 10,
       });
     }
 
+    // Visibility API to pause when tab is hidden
+    const handleVisibility = () => {
+      setIsVisible(!document.hidden);
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     animationRef.current = requestAnimationFrame(animate);
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      clearTimeout(resizeTimeout);
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [animate]);
+  }, [animate, prefersReducedMotion]);
+
+  // Don't render on reduced motion
+  if (prefersReducedMotion) {
+    return null;
+  }
 
   return (
     <canvas
@@ -96,8 +148,8 @@ export const GoldenParticles = () => {
       className="fixed inset-0 pointer-events-none z-0"
       style={{ 
         background: 'transparent',
-        willChange: 'transform'
       }}
+      aria-hidden="true"
     />
   );
 };
