@@ -9,5 +9,8 @@ verify_jwt = false
 [functions.meli-auth]
 verify_jwt = false
 
+[functions.meli-search]
+verify_jwt = false
+
 [functions.smart-product-search]
 verify_jwt = false
