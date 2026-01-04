@@ -17,7 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
-import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown, Users, Search, Settings } from "lucide-react";
+import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown, Users, Search, Settings, BarChart3 } from "lucide-react";
 import { GoldenParticles } from "@/components/GoldenParticles";
 import { SupplierManager } from "@/components/SupplierManager";
 import { SmartProductSearch } from "@/components/SmartProductSearch";
@@ -161,6 +161,15 @@ const Index = () => {
               </h1>
             </div>
             <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate("/dashboard")}
+                className="gap-2"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Dashboard
+              </Button>
               {isAdmin && (
                 <Button 
                   variant="outline" 
