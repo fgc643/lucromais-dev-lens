@@ -1,68 +1,69 @@
 import { MarketplaceFees } from "@/types/calculator";
 
-// Dados atualizados Janeiro 2026
+// Dados atualizados Setembro 2026
 export const MARKETPLACES: MarketplaceFees[] = [
   {
     name: "Mercado Livre",
     plans: {
-      "Clássico": { commission: 16, paymentFee: { card: 4.49, pix: 3.99 } },
-      "Premium": { commission: 14, paymentFee: { card: 4.49, pix: 3.99 } },
-      "Platinum": { commission: 12, paymentFee: { card: 4.49, pix: 3.99 } },
-      "MercadoLíder": { commission: 11, paymentFee: { card: 4.49, pix: 3.99 } },
-      "MercadoLíder Platinum": { commission: 10, paymentFee: { card: 4.49, pix: 3.99 } },
+      "Clássico": { commission: 17, paymentFee: { card: 4.79, pix: 4.19 } },
+      "Premium": { commission: 15, paymentFee: { card: 4.79, pix: 4.19 } },
+      "Platinum": { commission: 13, paymentFee: { card: 4.79, pix: 4.19 } },
+      "MercadoLíder": { commission: 12, paymentFee: { card: 4.79, pix: 4.19 } },
+      "MercadoLíder Platinum": { commission: 11, paymentFee: { card: 4.79, pix: 4.19 } },
+      "Full (Fulfillment)": { commission: 17, paymentFee: { card: 4.79, pix: 4.19 }, fulfillmentFee: 14 },
     },
   },
   {
     name: "Amazon",
     plans: {
-      "Individual": { commission: 15, fixedFee: 2 },
-      "Profissional": { commission: 15, fixedFee: 0 },
-      "FBA": { commission: 15, fixedFee: 0, fulfillmentFee: 12 },
+      "Individual": { commission: 16, fixedFee: 2 },
+      "Profissional": { commission: 16, fixedFee: 0 },
+      "FBA": { commission: 16, fixedFee: 0, fulfillmentFee: 14 },
     },
   },
   {
     name: "Shopee",
     plans: {
-      "Gratuito": { commission: 14, paymentFee: { card: 2.5, pix: 2 } },
-      "Preferido": { commission: 12, paymentFee: { card: 2.5, pix: 2 } },
-      "Mall": { commission: 10, paymentFee: { card: 2.5, pix: 2 } },
+      "Gratuito": { commission: 16, paymentFee: { card: 2.99, pix: 2.49 } },
+      "Preferido": { commission: 14, paymentFee: { card: 2.99, pix: 2.49 } },
+      "Mall": { commission: 12, paymentFee: { card: 2.99, pix: 2.49 } },
     },
   },
   {
     name: "Magazine Luiza",
     plans: {
-      "Padrão": { commission: 18, paymentFee: { card: 3.5, pix: 3 } },
-      "Premium": { commission: 15, paymentFee: { card: 3.5, pix: 3 } },
-      "Parceiro Magalu": { commission: 12, paymentFee: { card: 3.5, pix: 3 } },
+      "Padrão": { commission: 19, paymentFee: { card: 3.8, pix: 3.2 } },
+      "Premium": { commission: 16, paymentFee: { card: 3.8, pix: 3.2 } },
+      "Parceiro Magalu": { commission: 13, paymentFee: { card: 3.8, pix: 3.2 } },
     },
   },
   {
     name: "Americanas",
     plans: {
-      "Padrão": { commission: 17, paymentFee: { card: 3.8, pix: 3.2 } },
-      "3P Select": { commission: 14, paymentFee: { card: 3.8, pix: 3.2 } },
+      "Padrão": { commission: 18, paymentFee: { card: 3.99, pix: 3.39 } },
+      "3P Select": { commission: 15, paymentFee: { card: 3.99, pix: 3.39 } },
     },
   },
   {
     name: "Casas Bahia",
     plans: {
-      "Padrão": { commission: 16, paymentFee: { card: 3.5, pix: 3 } },
-      "Premium": { commission: 13, paymentFee: { card: 3.5, pix: 3 } },
+      "Padrão": { commission: 17, paymentFee: { card: 3.7, pix: 3.1 } },
+      "Premium": { commission: 14, paymentFee: { card: 3.7, pix: 3.1 } },
     },
   },
   {
     name: "iFood",
     plans: {
-      "Básico": { commission: 25 },
-      "Plano Entrega": { commission: 20 },
-      "Loop (Assinatura)": { commission: 12 },
+      "Básico": { commission: 26 },
+      "Plano Entrega": { commission: 21 },
+      "Loop (Assinatura)": { commission: 13 },
     },
   },
   {
     name: "Rappi",
     plans: {
-      "Padrão": { commission: 22 },
-      "Priority": { commission: 27 },
+      "Padrão": { commission: 23 },
+      "Priority": { commission: 28 },
     },
   },
   {
@@ -70,27 +71,27 @@ export const MARKETPLACES: MarketplaceFees[] = [
     plans: {
       "Produtor": { commission: 9.9, fixedFee: 1 },
       "Afiliado": { commission: 9.9, fixedFee: 1 },
-      "HotPay Parcelado": { commission: 11.39, fixedFee: 1 },
+      "HotPay Parcelado": { commission: 11.9, fixedFee: 1 },
     },
   },
   {
     name: "Eduzz",
     plans: {
-      "Produtor": { commission: 8.9, fixedFee: 1 },
-      "Afiliado": { commission: 8.9, fixedFee: 1 },
+      "Produtor": { commission: 9.9, fixedFee: 1 },
+      "Afiliado": { commission: 9.9, fixedFee: 1 },
     },
   },
   {
     name: "Monetizze",
     plans: {
       "Produtor": { commission: 9.9 },
-      "Com Recuperação": { commission: 11.9 },
+      "Com Recuperação": { commission: 12.5 },
     },
   },
   {
     name: "Kiwify",
     plans: {
-      "Padrão": { commission: 8.99, fixedFee: 1 },
+      "Padrão": { commission: 8.99, fixedFee: 2 },
     },
   },
   {
@@ -103,32 +104,39 @@ export const MARKETPLACES: MarketplaceFees[] = [
     name: "OLX",
     plans: {
       "Gratuito": { commission: 0 },
-      "Premium": { commission: 0, fixedFee: 15 },
-      "Destaque": { commission: 0, fixedFee: 29.9 },
+      "Premium": { commission: 0, fixedFee: 19.9 },
+      "Destaque": { commission: 0, fixedFee: 34.9 },
     },
   },
   {
     name: "Enjoei",
     plans: {
-      "Padrão": { commission: 20, paymentFee: { card: 3.18, pix: 2 } },
+      "Padrão": { commission: 22, paymentFee: { card: 3.49, pix: 2.2 } },
     },
   },
   {
     name: "Elo7",
     plans: {
-      "Padrão": { commission: 15, paymentFee: { card: 3.5, pix: 2.5 } },
+      "Padrão": { commission: 16, paymentFee: { card: 3.7, pix: 2.7 } },
     },
   },
   {
     name: "AliExpress (Vendedor BR)",
     plans: {
-      "Padrão": { commission: 8 },
+      "Padrão": { commission: 9 },
     },
   },
   {
     name: "Shein (Marketplace)",
     plans: {
-      "Padrão": { commission: 10 },
+      "Padrão": { commission: 12 },
+    },
+  },
+  {
+    name: "TikTok Shop",
+    plans: {
+      "Padrão": { commission: 8, paymentFee: { card: 2.99, pix: 2.49 } },
+      "Mall": { commission: 6, paymentFee: { card: 2.99, pix: 2.49 } },
     },
   },
 ];
