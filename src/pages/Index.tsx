@@ -17,11 +17,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
-import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown, Users, Search, Settings, BarChart3 } from "lucide-react";
+import { Calculator, TrendingUp, Loader2, Sparkles, Shield, Zap, Users, Search, Settings, BarChart3 } from "lucide-react";
 import { GoldenParticles } from "@/components/GoldenParticles";
 import { SupplierManager } from "@/components/SupplierManager";
 import { SmartProductSearch } from "@/components/SmartProductSearch";
-import { MeliProductSearch } from "@/components/MeliProductSearch";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -86,7 +85,7 @@ const Index = () => {
     setHistoryRefreshTrigger((prev) => prev + 1);
   };
 
-  if (authLoading || productsLoading || settingsLoading || isLoadingTrial) {
+  if (authLoading || productsLoading || settingsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
         <div className="text-center">
