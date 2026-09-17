@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
-import MercadoLivreCallback from "./pages/MercadoLivreCallback";
 import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -23,7 +22,6 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth/reset-password" element={<ResetPassword />} />
-          <Route path="/auth/mercadolivre" element={<MercadoLivreCallback />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/dashboard" element={<Dashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
