@@ -9,7 +9,7 @@ const corsHeaders = {
 // Base de conhecimento de marketplaces 2026
 const MARKETPLACE_KNOWLEDGE_2026 = `
 ═══════════════════════════════════════════════════════════════
-📊 DADOS DE REFERÊNCIA DOS MARKETPLACES - JANEIRO 2026
+📊 DADOS DE REFERÊNCIA DOS MARKETPLACES - SETEMBRO 2026
 ═══════════════════════════════════════════════════════════════
 
 🟡 MERCADO LIVRE:
@@ -127,7 +127,7 @@ serve(async (req) => {
       minute: '2-digit'
     });
 
-    const systemPrompt = `Você é um ESPECIALISTA EM PESQUISA DE MERCADO BRASILEIRO com acesso aos dados mais atualizados de Janeiro de 2026.
+    const systemPrompt = `Você é um ESPECIALISTA EM PESQUISA DE MERCADO BRASILEIRO com acesso aos dados mais atualizados de Setembro de 2026.
 
 ${MARKETPLACE_KNOWLEDGE_2026}
 
@@ -230,7 +230,7 @@ RESPONDA APENAS EM JSON com estrutura:
 
 IMPORTANTE:
 1. Retorne 3-4 produtos de cada marketplace principal (Mercado Livre, Amazon, Shopee, Magazine Luiza, Americanas)
-2. Preços devem refletir o mercado brasileiro de Janeiro 2026
+2. Preços devem refletir o mercado brasileiro de Setembro 2026
 3. Varie preços entre marketplaces (diferença de 5% a 30%)
 4. Inclua produtos de diferentes faixas de preço
 5. Dados de frete realistas

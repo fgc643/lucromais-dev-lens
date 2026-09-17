@@ -206,7 +206,7 @@ export const INSTALLMENT_OPTIONS = [
   { value: "24x", label: "24x sem juros", fee: 18 },
 ];
 
-// Taxas de frete por região (referência Correios 2026)
+// Taxas de frete por região (referência Correios Setembro 2026)
 export const SHIPPING_REFERENCE = {
   "Até 300g": { pac: { min: 18, max: 25 }, sedex: { min: 25, max: 40 } },
   "300g - 1kg": { pac: { min: 22, max: 35 }, sedex: { min: 35, max: 55 } },

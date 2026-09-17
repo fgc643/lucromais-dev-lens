@@ -175,7 +175,7 @@ serve(async (req) => {
       day: 'numeric'
     });
 
-    const systemPrompt = `Você é um COPYWRITER BRASILEIRO DE ELITE, especialista em vendas em marketplaces online com conhecimento atualizado de Janeiro de 2026.
+    const systemPrompt = `Você é um COPYWRITER BRASILEIRO DE ELITE, especialista em vendas em marketplaces online com conhecimento atualizado de Setembro de 2026.
 
 ${MARKETPLACE_COPYWRITING_2026}
 
