@@ -17,11 +17,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
-import { Calculator, TrendingUp, Loader2, Sparkles, Clock, Shield, Zap, Lock, Crown, Users, Search, Settings, BarChart3 } from "lucide-react";
+import { Calculator, TrendingUp, Loader2, Sparkles, Shield, Zap, Users, Search, Settings, BarChart3 } from "lucide-react";
 import { GoldenParticles } from "@/components/GoldenParticles";
 import { SupplierManager } from "@/components/SupplierManager";
 import { SmartProductSearch } from "@/components/SmartProductSearch";
-import { MeliProductSearch } from "@/components/MeliProductSearch";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -31,10 +30,6 @@ const Index = () => {
   const { toast } = useToast();
   const [currentProduct, setCurrentProduct] = useState<ProductData | null>(null);
   const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
-  const [trialDaysLeft, setTrialDaysLeft] = useState<number | null>(null);
-  const [isTrialExpired, setIsTrialExpired] = useState(false);
-  const [isLoadingTrial, setIsLoadingTrial] = useState(true);
-  const [isSubscribed, setIsSubscribed] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -53,7 +48,6 @@ const Index = () => {
     }
 
     if (user) {
-      checkTrialStatus();
       checkAdminRole();
     }
   }, [user, authLoading, navigate]);
@@ -71,37 +65,7 @@ const Index = () => {
     }
   };
 
-  const checkTrialStatus = async () => {
-    if (!user) return;
-    
-    setIsLoadingTrial(true);
-    try {
-      const { data, error } = await supabase
-        .rpc('check_subscription_status', { user_id: user.id });
-      
-      if (error) {
-        console.error('Error checking subscription:', error);
-        setIsTrialExpired(false);
-        setTrialDaysLeft(null);
-        setIsSubscribed(false);
-        return;
-      }
-      
-      if (data && data.length > 0) {
-        const status = data[0];
-        setIsTrialExpired(status.is_expired);
-        setTrialDaysLeft(status.is_trial ? status.days_left : null);
-        setIsSubscribed(status.is_subscribed);
-      }
-    } catch (error) {
-      console.error('Error checking trial status:', error);
-    } finally {
-      setIsLoadingTrial(false);
-    }
-  };
-
   const handleCalculate = async (product: ProductData) => {
-    // Bloqueio de trial desativado temporariamente
     setCurrentProduct(product);
     if (user) {
       await saveProduct(product);
@@ -109,15 +73,6 @@ const Index = () => {
     }
   };
 
-  const handleUpgrade = () => {
-    toast({
-      title: "💎 Upgrade para Premium",
-      description: "Entre em contato pelo WhatsApp para liberar seu acesso: R$99/mês",
-    });
-    // Open WhatsApp with pre-filled message
-    const message = encodeURIComponent(`Olá! Gostaria de assinar o plano Premium do Lucro Mais IA por R$99/mês. Meu email de cadastro é: ${user?.email}`);
-    window.open(`https://wa.me/5511932071021?text=${message}`, '_blank');
-  };
 
   const handleHistoryDelete = async (id: string) => {
     await deleteProduct(id);
@@ -130,7 +85,7 @@ const Index = () => {
     setHistoryRefreshTrigger((prev) => prev + 1);
   };
 
-  if (authLoading || productsLoading || settingsLoading || isLoadingTrial) {
+  if (authLoading || productsLoading || settingsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
         <div className="text-center">
@@ -192,24 +147,6 @@ const Index = () => {
                   Admin
                 </Button>
               )}
-              {isSubscribed && (
-                <Badge variant="default" className="gap-2 px-4 py-2 bg-primary text-primary-foreground">
-                  <Crown className="w-4 h-4" />
-                  Premium Ativo
-                </Badge>
-              )}
-              {!isSubscribed && !isTrialExpired && trialDaysLeft !== null && (
-                <Badge variant="outline" className="gap-2 px-4 py-2 text-sm">
-                  <Clock className="w-4 h-4" />
-                  {trialDaysLeft} {trialDaysLeft === 1 ? 'dia restante' : 'dias restantes'}
-                </Badge>
-              )}
-              {!isSubscribed && isTrialExpired && (
-                <Badge variant="destructive" className="gap-2 px-4 py-2">
-                  <Lock className="w-4 h-4" />
-                  Acesso Bloqueado
-                </Badge>
-              )}
             </div>
           </div>
         </header>
@@ -261,116 +198,36 @@ const Index = () => {
 
         {/* Calculadora ou Bloqueio */}
         <main className="container mx-auto px-4 pb-16">
-          {isTrialExpired && !isSubscribed ? (
-            <Card className="max-w-4xl mx-auto p-12 text-center card-3d luxury-card border-2 border-primary/50">
-              <Lock className="w-24 h-24 text-primary mx-auto mb-6 animate-pulse" />
-              <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Seu Período de Teste Terminou
-              </h3>
-              <p className="text-lg text-muted-foreground mb-8 max-w-md mx-auto">
-                Seu período de teste gratuito de 7 dias expirou. 
-                Assine agora por apenas R$99/mês e continue maximizando seus lucros!
-              </p>
-              
-              <div className="space-y-4 max-w-md mx-auto mb-8">
-                <div className="flex items-center gap-3 text-left">
-                  <Sparkles className="w-5 h-5 text-primary flex-shrink-0" />
-                  <span>Análise ilimitada com IA</span>
-                </div>
-                <div className="flex items-center gap-3 text-left">
-                  <TrendingUp className="w-5 h-5 text-primary flex-shrink-0" />
-                  <span>Cálculos em tempo real ilimitados</span>
-                </div>
-                <div className="flex items-center gap-3 text-left">
-                  <Shield className="w-5 h-5 text-primary flex-shrink-0" />
-                  <span>Suporte prioritário via WhatsApp</span>
-                </div>
-                <div className="flex items-center gap-3 text-left">
-                  <Users className="w-5 h-5 text-primary flex-shrink-0" />
-                  <span>Gerenciamento de fornecedores</span>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Formulário */}
+            <div className="lg:col-span-2 space-y-8">
+              <ProductForm onCalculate={handleCalculate} />
 
-              <div className="bg-primary/10 border border-primary/30 rounded-xl p-6 mb-8 max-w-md mx-auto">
-                <div className="text-4xl font-bold text-primary mb-2">R$ 99<span className="text-lg">/mês</span></div>
-                <p className="text-sm text-muted-foreground">Renovação mensal • Cancele quando quiser</p>
-              </div>
-
-              <Button 
-                size="lg" 
-                onClick={handleUpgrade}
-                className="text-lg px-8 py-6 shadow-3d hover:scale-105 transition-transform btn-premium"
-              >
-                <Crown className="w-5 h-5 mr-2" />
-                Assinar via WhatsApp
-              </Button>
-              
-              <p className="text-sm text-muted-foreground mt-4">
-                📱 Você será redirecionado para o WhatsApp para concluir o pagamento
-              </p>
-              
-              <div className="mt-6 p-4 bg-card/50 rounded-lg text-sm text-muted-foreground">
-                <p><strong>Email cadastrado:</strong> {user?.email}</p>
-                <p className="mt-1">Use este email para confirmar sua identidade</p>
-              </div>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Formulário */}
-              <div className="lg:col-span-2 space-y-8">
-                <ProductForm onCalculate={handleCalculate} />
-                
-                {currentProduct && (
-                  <div className="animate-fade-in">
-                    <ResultCard product={currentProduct} />
-                  </div>
-                )}
-                
-                {trialDaysLeft !== null && trialDaysLeft <= 3 && (
-                  <Card className="p-6 border-accent/50 bg-accent/10">
-                    <div className="flex items-center gap-4">
-                      <Clock className="w-8 h-8 text-accent flex-shrink-0" />
-                      <div className="flex-1">
-                        <h4 className="font-bold mb-1">
-                          ⚠️ Seu trial está acabando!
-                        </h4>
-                        <p className="text-sm text-muted-foreground">
-                          Restam apenas {trialDaysLeft} dias. Faça upgrade agora e garanta acesso ilimitado!
-                        </p>
-                      </div>
-                      <Button onClick={handleUpgrade} variant="default">
-                        Fazer Upgrade
-                      </Button>
-                    </div>
-                  </Card>
-                )}
-              </div>
-
-              {/* Histórico e Ferramentas */}
-              <div className="lg:col-span-1 space-y-6">
-                <div className="flex gap-2">
-                  <ReverseCalculator />
-                  {currentProduct && <ComparisonModal baseProduct={currentProduct} />}
+              {currentProduct && (
+                <div className="animate-fade-in">
+                  <ResultCard product={currentProduct} />
                 </div>
-                
-                <HistoryList
-                  key={historyRefreshTrigger}
-                  products={products}
-                  onItemClick={setCurrentProduct}
-                  onItemDelete={handleHistoryDelete}
-                  onClear={handleHistoryClear}
-                />
-              </div>
+              )}
             </div>
-          )}
+
+            {/* Histórico e Ferramentas */}
+            <div className="lg:col-span-1 space-y-6">
+              <div className="flex gap-2">
+                <ReverseCalculator />
+                {currentProduct && <ComparisonModal baseProduct={currentProduct} />}
+              </div>
+
+              <HistoryList
+                key={historyRefreshTrigger}
+                products={products}
+                onItemClick={setCurrentProduct}
+                onItemDelete={handleHistoryDelete}
+                onClear={handleHistoryClear}
+              />
+            </div>
+          </div>
         </main>
 
-        {/* Seção de Busca Real - Mercado Livre */}
-        <section className="container mx-auto px-4 py-12">
-          <ParallaxCard className="cascade-init animate-cascade-glow">
-            <MeliProductSearch />
-          </ParallaxCard>
-        </section>
 
         {/* Seção de Busca Inteligente com IA */}
         <section className="container mx-auto px-4 py-12">

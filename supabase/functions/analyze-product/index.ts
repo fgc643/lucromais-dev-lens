@@ -6,9 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Base de conhecimento atualizada Janeiro 2026 - Marketplaces Brasileiros
+// Base de conhecimento atualizada Setembro 2026 - Marketplaces Brasileiros
 const MARKETPLACE_DATA_2026 = `
-📊 BASE DE DADOS ATUALIZADA - JANEIRO 2026
+📊 BASE DE DADOS ATUALIZADA - SETEMBRO 2026
 
 ═══════════════════════════════════════════════════════════════
 🟡 MERCADO LIVRE - Líder do e-commerce brasileiro
@@ -396,7 +396,7 @@ RESPONDA APENAS EM JSON VÁLIDO com esta estrutura:
 📂 CATEGORIA: "${category}"
 
 Faça uma análise completa considerando:
-1. Preços praticados no mercado brasileiro em Janeiro de 2026
+1. Preços praticados no mercado brasileiro em Setembro de 2026
 2. Todas as taxas e comissões de cada marketplace
 3. Custos de frete por região
 4. Impostos (Simples Nacional, MEI)
