@@ -49,7 +49,6 @@ const Index = () => {
     }
 
     if (user) {
-      checkTrialStatus();
       checkAdminRole();
     }
   }, [user, authLoading, navigate]);
@@ -67,37 +66,7 @@ const Index = () => {
     }
   };
 
-  const checkTrialStatus = async () => {
-    if (!user) return;
-    
-    setIsLoadingTrial(true);
-    try {
-      const { data, error } = await supabase
-        .rpc('check_subscription_status', { user_id: user.id });
-      
-      if (error) {
-        console.error('Error checking subscription:', error);
-        setIsTrialExpired(false);
-        setTrialDaysLeft(null);
-        setIsSubscribed(false);
-        return;
-      }
-      
-      if (data && data.length > 0) {
-        const status = data[0];
-        setIsTrialExpired(status.is_expired);
-        setTrialDaysLeft(status.is_trial ? status.days_left : null);
-        setIsSubscribed(status.is_subscribed);
-      }
-    } catch (error) {
-      console.error('Error checking trial status:', error);
-    } finally {
-      setIsLoadingTrial(false);
-    }
-  };
-
   const handleCalculate = async (product: ProductData) => {
-    // Bloqueio de trial desativado temporariamente
     setCurrentProduct(product);
     if (user) {
       await saveProduct(product);
@@ -105,15 +74,6 @@ const Index = () => {
     }
   };
 
-  const handleUpgrade = () => {
-    toast({
-      title: "💎 Upgrade para Premium",
-      description: "Entre em contato pelo WhatsApp para liberar seu acesso: R$99/mês",
-    });
-    // Open WhatsApp with pre-filled message
-    const message = encodeURIComponent(`Olá! Gostaria de assinar o plano Premium do Lucro Mais IA por R$99/mês. Meu email de cadastro é: ${user?.email}`);
-    window.open(`https://wa.me/5511932071021?text=${message}`, '_blank');
-  };
 
   const handleHistoryDelete = async (id: string) => {
     await deleteProduct(id);
