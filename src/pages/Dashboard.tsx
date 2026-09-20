@@ -147,19 +147,21 @@ const Dashboard = () => {
 
   // Dados por marketplace
   const marketplaceData = useMemo(() => {
-    const data: Record<string, { count: number; revenue: number; profit: number; margin: number }> = {};
-    
+    const data: Record<string, { count: number; revenue: number; profit: number; margin: number; fees: number }> = {};
+
     filteredProducts.forEach(product => {
-      const results = calculateProfit(product);
-      
+      const results = safeCalculate(product);
+      if (!results) return;
+
       if (!data[product.marketplace]) {
-        data[product.marketplace] = { count: 0, revenue: 0, profit: 0, margin: 0 };
+        data[product.marketplace] = { count: 0, revenue: 0, profit: 0, margin: 0, fees: 0 };
       }
-      
+
       data[product.marketplace].count++;
       data[product.marketplace].revenue += product.salePrice;
       data[product.marketplace].profit += results.netProfit;
       data[product.marketplace].margin += results.profitMargin;
+      data[product.marketplace].fees += results.fees.total;
     });
 
     return Object.entries(data).map(([name, values]) => ({
@@ -167,7 +169,8 @@ const Dashboard = () => {
       count: values.count,
       revenue: values.revenue,
       profit: values.profit,
-      margin: values.margin / values.count
+      fees: values.fees,
+      margin: values.count > 0 ? values.margin / values.count : 0
     })).sort((a, b) => b.profit - a.profit);
   }, [filteredProducts]);
 
