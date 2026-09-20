@@ -32,7 +32,7 @@ export const MARKETPLACES: MarketplaceFees[] = [
       "Gratuito (até R$ 79,99)": { commission: 20, fixedFee: 4 },
       "Gratuito (R$ 80 a R$ 199,99)": { commission: 14, fixedFee: 20 },
       "Gratuito (acima de R$ 200)": { commission: 14, fixedFee: 26 },
-et    },
+    },
   },
   {
     name: "Magazine Luiza",
