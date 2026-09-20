@@ -141,10 +141,12 @@ export const MARKETPLACES: MarketplaceFees[] = [
     },
   },
   {
+    // TikTok Shop Set/2026: nova tabela vigente desde 15/07/2026
+    // Comissão + taxa fixa por item. Programa de Frete Grátis: +6% (opcional)
     name: "TikTok Shop",
     plans: {
-      "Padrão": { commission: 8, paymentFee: { card: 2.99, pix: 2.49 } },
-      "Mall": { commission: 6, paymentFee: { card: 2.99, pix: 2.49 } },
+      "Padrão (até R$ 49,99)": { commission: 10, fixedFee: 4 },
+      "Padrão (R$ 50 ou mais)": { commission: 6, fixedFee: 6 },
     },
   },
 ];
