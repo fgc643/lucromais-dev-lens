@@ -3,20 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { calculateProfit } from "@/utils/calculator";
+import { MARKETPLACES } from "@/data/marketplaces";
+import { ProductData } from "@/types/calculator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  ArrowLeft, 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Package, 
-  Percent, 
+  ArrowLeft,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Package,
+  Percent,
   ShoppingCart,
   BarChart3,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  Receipt,
+  AlertTriangle,
+  Wallet
 } from "lucide-react";
 import {
   PieChart,
@@ -56,6 +61,15 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
+// Calcula lucro sem quebrar quando o produto usa um plano antigo (taxas atualizadas em Set/2026)
+const safeCalculate = (product: ProductData) => {
+  try {
+    return calculateProfit(product);
+  } catch {
+    return null;
+  }
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -80,26 +94,37 @@ const Dashboard = () => {
         totalRevenue: 0,
         totalCost: 0,
         totalProfit: 0,
+        totalFees: 0,
         avgMargin: 0,
         profitableCount: 0,
-        unprofitableCount: 0
+        unprofitableCount: 0,
+        outdatedCount: 0
       };
     }
 
     let totalRevenue = 0;
     let totalCost = 0;
     let totalProfit = 0;
+    let totalFees = 0;
     let totalMargin = 0;
+    let calculatedCount = 0;
     let profitableCount = 0;
     let unprofitableCount = 0;
+    let outdatedCount = 0;
 
     filteredProducts.forEach(product => {
-      const results = calculateProfit(product);
+      const results = safeCalculate(product);
+      if (!results) {
+        outdatedCount++;
+        return;
+      }
+      calculatedCount++;
       totalRevenue += product.salePrice;
       totalCost += product.costPrice;
       totalProfit += results.netProfit;
+      totalFees += results.fees.total;
       totalMargin += results.profitMargin;
-      
+
       if (results.netProfit > 0) {
         profitableCount++;
       } else {
@@ -112,27 +137,31 @@ const Dashboard = () => {
       totalRevenue,
       totalCost,
       totalProfit,
-      avgMargin: totalMargin / filteredProducts.length,
+      totalFees,
+      avgMargin: calculatedCount > 0 ? totalMargin / calculatedCount : 0,
       profitableCount,
-      unprofitableCount
+      unprofitableCount,
+      outdatedCount
     };
   }, [filteredProducts]);
 
   // Dados por marketplace
   const marketplaceData = useMemo(() => {
-    const data: Record<string, { count: number; revenue: number; profit: number; margin: number }> = {};
-    
+    const data: Record<string, { count: number; revenue: number; profit: number; margin: number; fees: number }> = {};
+
     filteredProducts.forEach(product => {
-      const results = calculateProfit(product);
-      
+      const results = safeCalculate(product);
+      if (!results) return;
+
       if (!data[product.marketplace]) {
-        data[product.marketplace] = { count: 0, revenue: 0, profit: 0, margin: 0 };
+        data[product.marketplace] = { count: 0, revenue: 0, profit: 0, margin: 0, fees: 0 };
       }
-      
+
       data[product.marketplace].count++;
       data[product.marketplace].revenue += product.salePrice;
       data[product.marketplace].profit += results.netProfit;
       data[product.marketplace].margin += results.profitMargin;
+      data[product.marketplace].fees += results.fees.total;
     });
 
     return Object.entries(data).map(([name, values]) => ({
@@ -140,7 +169,8 @@ const Dashboard = () => {
       count: values.count,
       revenue: values.revenue,
       profit: values.profit,
-      margin: values.margin / values.count
+      fees: values.fees,
+      margin: values.count > 0 ? values.margin / values.count : 0
     })).sort((a, b) => b.profit - a.profit);
   }, [filteredProducts]);
 
@@ -164,8 +194,9 @@ const Dashboard = () => {
     
     filteredProducts.forEach(product => {
       const date = format(new Date(product.createdAt), "dd/MM");
-      const results = calculateProfit(product);
-      
+      const results = safeCalculate(product);
+      if (!results) return;
+
       if (data[date]) {
         data[date].profit += results.netProfit;
         data[date].count++;
@@ -178,12 +209,31 @@ const Dashboard = () => {
   // Top produtos mais lucrativos
   const topProducts = useMemo(() => {
     return [...filteredProducts]
-      .map(product => ({
-        ...product,
-        results: calculateProfit(product)
-      }))
+      .map(product => ({ ...product, results: safeCalculate(product) }))
+      .filter((p): p is typeof p & { results: NonNullable<ReturnType<typeof safeCalculate>> } => p.results !== null)
       .sort((a, b) => b.results.netProfit - a.results.netProfit)
       .slice(0, 5);
+  }, [filteredProducts]);
+
+  // Impacto das tarifas por produto
+  const feeImpact = useMemo(() => {
+    return filteredProducts
+      .map(product => {
+        const results = safeCalculate(product);
+        if (!results) {
+          return { ...product, results: null as null, feePct: 0 };
+        }
+        return {
+          ...product,
+          results,
+          feePct: product.salePrice > 0 ? (results.fees.total / product.salePrice) * 100 : 0
+        };
+      })
+      .sort((a, b) => {
+        const feeA = a.results ? a.results.fees.total : 0;
+        const feeB = b.results ? b.results.fees.total : 0;
+        return feeB - feeA;
+      });
   }, [filteredProducts]);
 
   // Loading state
@@ -255,6 +305,21 @@ const Dashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
+        {/* Aviso de planos desatualizados */}
+        {metrics.outdatedCount > 0 && (
+          <div className="flex items-start gap-3 p-4 rounded-lg border border-yellow-500/40 bg-yellow-500/10 text-sm">
+            <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-yellow-500">
+                {metrics.outdatedCount} {metrics.outdatedCount === 1 ? "produto usa um plano antigo" : "produtos usam planos antigos"}
+              </p>
+              <p className="text-muted-foreground">
+                As tarifas foram atualizadas em setembro/2026. Edite {metrics.outdatedCount === 1 ? "esse produto" : "esses produtos"} e reescolha o plano do marketplace para voltar a ver o cálculo correto.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Cards de Métricas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="border-primary/20">
@@ -288,6 +353,10 @@ const Dashboard = () => {
               <div className="text-3xl font-bold">{formatCurrency(metrics.totalRevenue)}</div>
               <p className="text-xs text-muted-foreground mt-2">
                 Custo: {formatCurrency(metrics.totalCost)}
+              </p>
+              <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
+                <Receipt className="w-3 h-3" />
+                Tarifas: {formatCurrency(metrics.totalFees)}
               </p>
             </CardContent>
           </Card>
