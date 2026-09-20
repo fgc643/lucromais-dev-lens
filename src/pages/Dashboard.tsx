@@ -194,8 +194,9 @@ const Dashboard = () => {
     
     filteredProducts.forEach(product => {
       const date = format(new Date(product.createdAt), "dd/MM");
-      const results = calculateProfit(product);
-      
+      const results = safeCalculate(product);
+      if (!results) return;
+
       if (data[date]) {
         data[date].profit += results.netProfit;
         data[date].count++;
@@ -208,12 +209,31 @@ const Dashboard = () => {
   // Top produtos mais lucrativos
   const topProducts = useMemo(() => {
     return [...filteredProducts]
-      .map(product => ({
-        ...product,
-        results: calculateProfit(product)
-      }))
+      .map(product => ({ ...product, results: safeCalculate(product) }))
+      .filter((p): p is typeof p & { results: NonNullable<ReturnType<typeof safeCalculate>> } => p.results !== null)
       .sort((a, b) => b.results.netProfit - a.results.netProfit)
       .slice(0, 5);
+  }, [filteredProducts]);
+
+  // Impacto das tarifas por produto
+  const feeImpact = useMemo(() => {
+    return filteredProducts
+      .map(product => {
+        const results = safeCalculate(product);
+        if (!results) {
+          return { ...product, results: null as null, feePct: 0 };
+        }
+        return {
+          ...product,
+          results,
+          feePct: product.salePrice > 0 ? (results.fees.total / product.salePrice) * 100 : 0
+        };
+      })
+      .sort((a, b) => {
+        const feeA = a.results ? a.results.fees.total : 0;
+        const feeB = b.results ? b.results.fees.total : 0;
+        return feeB - feeA;
+      });
   }, [filteredProducts]);
 
   // Loading state
