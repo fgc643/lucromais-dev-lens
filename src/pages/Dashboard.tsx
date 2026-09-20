@@ -94,26 +94,37 @@ const Dashboard = () => {
         totalRevenue: 0,
         totalCost: 0,
         totalProfit: 0,
+        totalFees: 0,
         avgMargin: 0,
         profitableCount: 0,
-        unprofitableCount: 0
+        unprofitableCount: 0,
+        outdatedCount: 0
       };
     }
 
     let totalRevenue = 0;
     let totalCost = 0;
     let totalProfit = 0;
+    let totalFees = 0;
     let totalMargin = 0;
+    let calculatedCount = 0;
     let profitableCount = 0;
     let unprofitableCount = 0;
+    let outdatedCount = 0;
 
     filteredProducts.forEach(product => {
-      const results = calculateProfit(product);
+      const results = safeCalculate(product);
+      if (!results) {
+        outdatedCount++;
+        return;
+      }
+      calculatedCount++;
       totalRevenue += product.salePrice;
       totalCost += product.costPrice;
       totalProfit += results.netProfit;
+      totalFees += results.fees.total;
       totalMargin += results.profitMargin;
-      
+
       if (results.netProfit > 0) {
         profitableCount++;
       } else {
@@ -126,9 +137,11 @@ const Dashboard = () => {
       totalRevenue,
       totalCost,
       totalProfit,
-      avgMargin: totalMargin / filteredProducts.length,
+      totalFees,
+      avgMargin: calculatedCount > 0 ? totalMargin / calculatedCount : 0,
       profitableCount,
-      unprofitableCount
+      unprofitableCount,
+      outdatedCount
     };
   }, [filteredProducts]);
 
