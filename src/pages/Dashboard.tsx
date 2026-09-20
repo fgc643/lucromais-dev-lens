@@ -61,6 +61,15 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
+// Calcula lucro sem quebrar quando o produto usa um plano antigo (taxas atualizadas em Set/2026)
+const safeCalculate = (product: ProductData) => {
+  try {
+    return calculateProfit(product);
+  } catch {
+    return null;
+  }
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
