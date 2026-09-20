@@ -305,6 +305,21 @@ const Dashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
+        {/* Aviso de planos desatualizados */}
+        {metrics.outdatedCount > 0 && (
+          <div className="flex items-start gap-3 p-4 rounded-lg border border-yellow-500/40 bg-yellow-500/10 text-sm">
+            <AlertTriangle className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold text-yellow-500">
+                {metrics.outdatedCount} {metrics.outdatedCount === 1 ? "produto usa um plano antigo" : "produtos usam planos antigos"}
+              </p>
+              <p className="text-muted-foreground">
+                As tarifas foram atualizadas em setembro/2026. Edite {metrics.outdatedCount === 1 ? "esse produto" : "esses produtos"} e reescolha o plano do marketplace para voltar a ver o cálculo correto.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Cards de Métricas */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="border-primary/20">
