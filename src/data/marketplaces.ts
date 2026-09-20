@@ -35,11 +35,14 @@ export const MARKETPLACES: MarketplaceFees[] = [
     },
   },
   {
+    // Magalu Set/2026: comissão por categoria (10% a 19%) + tarifa por item
+    // R$ 5,00 por item (R$ 5,50 a partir de 10/09/2026 em categorias como Moda)
+    // Promoção novos sellers: 9,9% por 90 dias ou até R$ 100 mil em vendas
     name: "Magazine Luiza",
     plans: {
-      "Padrão": { commission: 19, paymentFee: { card: 3.8, pix: 3.2 } },
-      "Premium": { commission: 16, paymentFee: { card: 3.8, pix: 3.2 } },
-      "Parceiro Magalu": { commission: 13, paymentFee: { card: 3.8, pix: 3.2 } },
+      "Padrão": { commission: 18, fixedFee: 5.5 },
+      "Novo Seller (Promo 90 dias)": { commission: 9.9, fixedFee: 5.5 },
+      "Categorias com taxa reduzida": { commission: 12, fixedFee: 5.5 },
     },
   },
   {
