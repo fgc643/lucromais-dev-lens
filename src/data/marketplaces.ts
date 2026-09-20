@@ -14,27 +14,35 @@ export const MARKETPLACES: MarketplaceFees[] = [
     },
   },
   {
+    // Amazon Set/2026: comissão por categoria (10% a 15%, mín. R$ 1 por item)
+    // Plano Profissional: R$ 19/mês (grátis no 1º ano). Individual: R$ 2 por item.
     name: "Amazon",
     plans: {
-      "Individual": { commission: 16, fixedFee: 2 },
-      "Profissional": { commission: 16, fixedFee: 0 },
-      "FBA": { commission: 16, fixedFee: 0, fulfillmentFee: 14 },
+      "Individual": { commission: 13, fixedFee: 2 },
+      "Profissional": { commission: 13, fixedFee: 0 },
+      "FBA": { commission: 13, fixedFee: 0, fulfillmentFee: 14 },
     },
   },
   {
+    // Shopee Set/2026: tabela única (CNPJ e CPF até 450 pedidos/90 dias)
+    // Comissão por faixa de preço + taxa fixa por item. Fim do teto de R$ 100.
+    // Comissão já inclui a taxa de transação. Campanhas de destaque: +3,5%.
     name: "Shopee",
     plans: {
-      "Gratuito": { commission: 16, paymentFee: { card: 2.99, pix: 2.49 } },
-      "Preferido": { commission: 14, paymentFee: { card: 2.99, pix: 2.49 } },
-      "Mall": { commission: 12, paymentFee: { card: 2.99, pix: 2.49 } },
+      "Gratuito (até R$ 79,99)": { commission: 20, fixedFee: 4 },
+      "Gratuito (R$ 80 a R$ 199,99)": { commission: 14, fixedFee: 20 },
+      "Gratuito (acima de R$ 200)": { commission: 14, fixedFee: 26 },
     },
   },
   {
+    // Magalu Set/2026: comissão por categoria (10% a 19%) + tarifa por item
+    // R$ 5,00 por item (R$ 5,50 a partir de 10/09/2026 em categorias como Moda)
+    // Promoção novos sellers: 9,9% por 90 dias ou até R$ 100 mil em vendas
     name: "Magazine Luiza",
     plans: {
-      "Padrão": { commission: 19, paymentFee: { card: 3.8, pix: 3.2 } },
-      "Premium": { commission: 16, paymentFee: { card: 3.8, pix: 3.2 } },
-      "Parceiro Magalu": { commission: 13, paymentFee: { card: 3.8, pix: 3.2 } },
+      "Padrão": { commission: 18, fixedFee: 5.5 },
+      "Novo Seller (Promo 90 dias)": { commission: 9.9, fixedFee: 5.5 },
+      "Categorias com taxa reduzida": { commission: 12, fixedFee: 5.5 },
     },
   },
   {
@@ -133,10 +141,12 @@ export const MARKETPLACES: MarketplaceFees[] = [
     },
   },
   {
+    // TikTok Shop Set/2026: nova tabela vigente desde 15/07/2026
+    // Comissão + taxa fixa por item. Programa de Frete Grátis: +6% (opcional)
     name: "TikTok Shop",
     plans: {
-      "Padrão": { commission: 8, paymentFee: { card: 2.99, pix: 2.49 } },
-      "Mall": { commission: 6, paymentFee: { card: 2.99, pix: 2.49 } },
+      "Padrão (até R$ 49,99)": { commission: 10, fixedFee: 4 },
+      "Padrão (R$ 50 ou mais)": { commission: 6, fixedFee: 6 },
     },
   },
 ];
