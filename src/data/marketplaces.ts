@@ -14,20 +14,25 @@ export const MARKETPLACES: MarketplaceFees[] = [
     },
   },
   {
+    // Amazon Set/2026: comissão por categoria (10% a 15%, mín. R$ 1 por item)
+    // Plano Profissional: R$ 19/mês (grátis no 1º ano). Individual: R$ 2 por item.
     name: "Amazon",
     plans: {
-      "Individual": { commission: 16, fixedFee: 2 },
-      "Profissional": { commission: 16, fixedFee: 0 },
-      "FBA": { commission: 16, fixedFee: 0, fulfillmentFee: 14 },
+      "Individual": { commission: 13, fixedFee: 2 },
+      "Profissional": { commission: 13, fixedFee: 0 },
+      "FBA": { commission: 13, fixedFee: 0, fulfillmentFee: 14 },
     },
   },
   {
+    // Shopee Set/2026: tabela única (CNPJ e CPF até 450 pedidos/90 dias)
+    // Comissão por faixa de preço + taxa fixa por item. Fim do teto de R$ 100.
+    // Comissão já inclui a taxa de transação. Campanhas de destaque: +3,5%.
     name: "Shopee",
     plans: {
-      "Gratuito": { commission: 16, paymentFee: { card: 2.99, pix: 2.49 } },
-      "Preferido": { commission: 14, paymentFee: { card: 2.99, pix: 2.49 } },
-      "Mall": { commission: 12, paymentFee: { card: 2.99, pix: 2.49 } },
-    },
+      "Gratuito (até R$ 79,99)": { commission: 20, fixedFee: 4 },
+      "Gratuito (R$ 80 a R$ 199,99)": { commission: 14, fixedFee: 20 },
+      "Gratuito (acima de R$ 200)": { commission: 14, fixedFee: 26 },
+et    },
   },
   {
     name: "Magazine Luiza",
