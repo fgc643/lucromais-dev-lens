@@ -3,20 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useProducts } from "@/hooks/useProducts";
 import { calculateProfit } from "@/utils/calculator";
+import { MARKETPLACES } from "@/data/marketplaces";
+import { ProductData } from "@/types/calculator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  ArrowLeft, 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Package, 
-  Percent, 
+  ArrowLeft,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Package,
+  Percent,
   ShoppingCart,
   BarChart3,
-  PieChart as PieChartIcon
+  PieChart as PieChartIcon,
+  Receipt,
+  AlertTriangle,
+  Wallet
 } from "lucide-react";
 import {
   PieChart,
