@@ -605,10 +605,14 @@ const Dashboard = () => {
                           {formatCurrency(mp.profit)}
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground">Receita: </span>
                           <span className="font-medium">{formatCurrency(mp.revenue)}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">Tarifas: </span>
+                          <span className="font-medium text-red-400">{formatCurrency(mp.fees)}</span>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Margem média: </span>
