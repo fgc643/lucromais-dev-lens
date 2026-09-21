@@ -628,6 +628,131 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Impacto das Tarifas no Lucro */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-primary" />
+              Impacto das Tarifas no Lucro por Produto
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {feeImpact.length > 0 ? (
+              <div className="space-y-3">
+                {feeImpact.map((product) => (
+                  <div
+                    key={product.id}
+                    className="p-3 rounded-lg bg-muted/30 border border-border/50 space-y-2"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-medium truncate">{product.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {product.marketplace} • {product.plan}
+                        </p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-sm text-muted-foreground">
+                          Venda: {formatCurrency(product.salePrice)}
+                        </p>
+                        {product.results ? (
+                          <p className={`font-bold ${product.results.netProfit >= 0 ? "text-green-500" : "text-red-500"}`}>
+                            Lucro: {formatCurrency(product.results.netProfit)}
+                          </p>
+                        ) : (
+                          <p className="text-xs font-medium text-yellow-500 flex items-center gap-1 justify-end">
+                            <AlertTriangle className="w-3 h-3" /> Plano desatualizado
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {product.results && (
+                      <>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Receipt className="w-3 h-3" />
+                            Tarifas: {formatCurrency(product.results.fees.total)} ({product.feePct.toFixed(1)}% da venda)
+                          </span>
+                          <span>
+                            Lucro sem tarifas: {formatCurrency(product.results.grossProfit)}
+                          </span>
+                        </div>
+                        <div className="h-2 w-full rounded-full bg-muted overflow-hidden flex">
+                          <div
+                            className="h-full bg-red-500/70"
+                            style={{ width: `${Math.min(product.feePct, 100)}%` }}
+                          />
+                          <div
+                            className="h-full bg-green-500/70"
+                            style={{ width: `${Math.max(Math.min(product.results.profitMargin, 100 - product.feePct), 0)}%` }}
+                          />
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          {product.results.fees.commission > 0 && (
+                            <span>Comissão: {formatCurrency(product.results.fees.commission)}</span>
+                          )}
+                          {product.results.fees.payment > 0 && (
+                            <span>Pagamento: {formatCurrency(product.results.fees.payment)}</span>
+                          )}
+                          {product.results.fees.shipping > 0 && (
+                            <span>Frete: {formatCurrency(product.results.fees.shipping)}</span>
+                          )}
+                          {product.results.fees.simplesNacional > 0 && (
+                            <span>Simples: {formatCurrency(product.results.fees.simplesNacional)}</span>
+                          )}
+                          {product.results.fees.ads > 0 && (
+                            <span>Ads: {formatCurrency(product.results.fees.ads)}</span>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="h-[200px] flex items-center justify-center text-muted-foreground">
+                Nenhum produto cadastrado
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Tarifas Vigentes por Marketplace (Set/2026) */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Receipt className="w-5 h-5 text-primary" />
+              Tarifas Vigentes por Marketplace — Setembro 2026
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {MARKETPLACES.map((mp) => (
+                <div
+                  key={mp.name}
+                  className="p-3 rounded-lg bg-muted/30 border border-border/50"
+                >
+                  <p className="font-semibold mb-2">{mp.name}</p>
+                  <div className="space-y-2">
+                    {Object.entries(mp.plans).map(([planName, plan]) => (
+                      <div key={planName} className="text-xs">
+                        <p className="font-medium text-foreground/90">{planName}</p>
+                        <p className="text-muted-foreground">
+                          Comissão {plan.commission}%
+                          {plan.fixedFee ? ` + ${formatCurrency(plan.fixedFee)}/item` : ""}
+                          {plan.paymentFee ? ` • Pagto: ${plan.paymentFee.card}% cartão / ${plan.paymentFee.pix}% pix` : ""}
+                          {plan.fulfillmentFee ? ` • Fulfillment: ${formatCurrency(plan.fulfillmentFee)}` : ""}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
