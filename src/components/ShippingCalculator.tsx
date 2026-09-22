@@ -1,33 +1,36 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { Loader2, Truck, MapPin, Package, AlertCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Loader2, Truck, MapPin, Package, AlertCircle, Table2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ProductData } from "@/types/calculator";
 import { calculateProfit, formatCurrency, formatPercentage } from "@/utils/calculator";
+import { MARKETPLACES } from "@/data/marketplaces";
+import {
+  BASE_TABLE,
+  CEP_RANGES,
+  SHIPPING_UPDATED_AT,
+  ZONE_LABEL,
+  Zone,
+  cubedWeight,
+  findCepRange,
+  formatCepRange,
+  getShippingOptionsFor,
+  getZone,
+  quoteShipping,
+} from "@/data/shipping";
 
-interface ShippingOption {
-  id: string;
-  carrier: string;
-  service: string;
-  price: number;
-  days: number;
-  note: string;
-}
-
-interface ShippingResult {
-  origin: { cep: string; city: string; uf: string; neighborhood: string; street: string };
-  destination: { cep: string; city: string; uf: string; neighborhood: string; street: string };
-  billedWeight: number;
-  realWeight: number;
-  cubedWeight: number;
-  insurance: number;
-  options: ShippingOption[];
-  reference: string;
+interface AddressInfo {
+  cep: string;
+  city: string;
+  uf: string;
+  neighborhood: string;
+  street: string;
 }
 
 interface Props {
@@ -44,13 +47,51 @@ export const ShippingCalculator = ({ products }: Props) => {
   const [destCep, setDestCep] = useState("");
   const [weight, setWeight] = useState("0.5");
   const [dims, setDims] = useState({ length: "20", width: "15", height: "10" });
+  const [marketplace, setMarketplace] = useState("Mercado Livre");
+  const [salePrice, setSalePrice] = useState("129");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<ShippingResult | null>(null);
+  const [origin, setOrigin] = useState<AddressInfo | null>(null);
+  const [destination, setDestination] = useState<AddressInfo | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
 
-  const declaredValue = products.length
-    ? products.reduce((sum, p) => sum + p.salePrice, 0) / products.length
-    : 0;
+  const numbers = {
+    weight: Number(weight.replace(",", ".")) || 0,
+    length: Number(dims.length) || 20,
+    width: Number(dims.width) || 15,
+    height: Number(dims.height) || 10,
+    salePrice: Number(salePrice.replace(",", ".")) || 0,
+  };
+
+  const originRange = findCepRange(originCep);
+  const destRange = findCepRange(destCep);
+  const zone: Zone =
+    originRange && destRange ? getZone(originRange.region, destRange.region) : 1;
+
+  const options = useMemo(() => getShippingOptionsFor(marketplace), [marketplace]);
+
+  const quotes = useMemo(
+    () =>
+      options.map((option) =>
+        quoteShipping({
+          option,
+          zone,
+          weight: numbers.weight,
+          length: numbers.length,
+          width: numbers.width,
+          height: numbers.height,
+          salePrice: numbers.salePrice,
+        })
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [options, zone, weight, dims.length, dims.width, dims.height, salePrice]
+  );
+
+  const selectedQuote = quotes.find((q) => q.service === selected) ?? quotes[0] ?? null;
+
+  const billedWeight = Math.max(
+    numbers.weight,
+    cubedWeight(numbers.length, numbers.width, numbers.height)
+  );
 
   const handleCalculate = async () => {
     if (originCep.replace(/\D/g, "").length !== 8 || destCep.replace(/\D/g, "").length !== 8) {
@@ -58,53 +99,82 @@ export const ShippingCalculator = ({ products }: Props) => {
       return;
     }
     setLoading(true);
-    setResult(null);
     try {
       const { data, error } = await supabase.functions.invoke("calculate-shipping", {
         body: {
           originCep,
           destCep,
-          weight: Number(weight.replace(",", ".")) || 0,
-          length: Number(dims.length) || 20,
-          width: Number(dims.width) || 15,
-          height: Number(dims.height) || 10,
-          declaredValue,
+          weight: numbers.weight,
+          length: numbers.length,
+          width: numbers.width,
+          height: numbers.height,
+          declaredValue: numbers.salePrice,
         },
       });
-
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
-
-      setResult(data as ShippingResult);
-      setSelected((data as ShippingResult).options[0]?.id ?? null);
-      toast.success("Frete calculado com sucesso!");
+      setOrigin(data.origin);
+      setDestination(data.destination);
+      setSelected(null);
+      toast.success("Endereços confirmados e tabela de frete atualizada!");
     } catch (e: any) {
-      toast.error(e?.message || "Não foi possível calcular o frete agora.");
+      toast.error(e?.message || "Não foi possível consultar os CEPs agora.");
     } finally {
       setLoading(false);
     }
   };
 
-  const selectedOption = result?.options.find((o) => o.id === selected) ?? null;
+  /** Tabela por faixa de CEP: preço do serviço escolhido para cada estado de destino. */
+  const cepTable = useMemo(() => {
+    if (!originRange || !selectedQuote) return [];
+    const option = options.find((o) => o.service === selectedQuote.service)!;
+    return CEP_RANGES.map((range) => {
+      const z = getZone(originRange.region, range.region);
+      const q = quoteShipping({
+        option,
+        zone: z,
+        weight: numbers.weight,
+        length: numbers.length,
+        width: numbers.width,
+        height: numbers.height,
+        salePrice: numbers.salePrice,
+      });
+      return { range, zone: z, quote: q };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [originRange?.uf, selectedQuote?.service, options, weight, dims, salePrice]);
 
-  const productRows = (() => {
-    if (!selectedOption) return [];
+  const productRows = useMemo(() => {
     return products
       .map((product) => {
+        const productOptions = getShippingOptionsFor(product.marketplace);
+        const option =
+          productOptions.find((o) => o.service === selectedQuote?.service) ?? productOptions[0];
+        const q = quoteShipping({
+          option,
+          zone,
+          weight: numbers.weight,
+          length: numbers.length,
+          width: numbers.width,
+          height: numbers.height,
+          salePrice: product.salePrice,
+        });
         try {
           const before = calculateProfit(product);
-          const after = calculateProfit({ ...product, shippingCost: selectedOption.price });
-          return { product, before, after };
+          const after = calculateProfit({ ...product, shippingCost: q.sellerPrice });
+          return { product, before, after, quote: q };
         } catch {
           return null;
         }
       })
       .filter(Boolean) as {
-        product: ProductData;
-        before: ReturnType<typeof calculateProfit>;
-        after: ReturnType<typeof calculateProfit>;
-      }[];
-  })();
+      product: ProductData;
+      before: ReturnType<typeof calculateProfit>;
+      after: ReturnType<typeof calculateProfit>;
+      quote: ReturnType<typeof quoteShipping>;
+    }[];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products, zone, selectedQuote?.service, weight, dims, salePrice]);
 
   return (
     <Card className="w-full shadow-3d border-primary/20 luxury-card overflow-hidden">
@@ -118,7 +188,7 @@ export const ShippingCalculator = ({ products }: Props) => {
               Frete por CEP e Lucro Líquido
             </p>
             <p className="text-xs text-muted-foreground font-normal">
-              Endereço real consultado pelo CEP + tabelas de envio Setembro/2026
+              Tabela de frete por faixa de CEP de cada marketplace — atualizada em {SHIPPING_UPDATED_AT}
             </p>
           </div>
         </CardTitle>
@@ -135,6 +205,11 @@ export const ShippingCalculator = ({ products }: Props) => {
               value={originCep}
               onChange={(e) => setOriginCep(maskCep(e.target.value))}
             />
+            {originRange && (
+              <p className="text-xs text-muted-foreground">
+                {originRange.label} ({originRange.uf}) • faixa {formatCepRange(originRange)}
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="destCep">CEP de destino (cliente)</Label>
@@ -145,10 +220,30 @@ export const ShippingCalculator = ({ products }: Props) => {
               value={destCep}
               onChange={(e) => setDestCep(maskCep(e.target.value))}
             />
+            {destRange && (
+              <p className="text-xs text-muted-foreground">
+                {destRange.label} ({destRange.uf}) • {ZONE_LABEL[zone]}
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+          <div className="space-y-2 col-span-2">
+            <Label>Marketplace</Label>
+            <Select value={marketplace} onValueChange={(v) => { setMarketplace(v); setSelected(null); }}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                {MARKETPLACES.map((m) => (
+                  <SelectItem key={m.name} value={m.name}>
+                    {m.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="weight">Peso (kg)</Label>
             <Input id="weight" inputMode="decimal" value={weight} onChange={(e) => setWeight(e.target.value)} />
@@ -167,123 +262,176 @@ export const ShippingCalculator = ({ products }: Props) => {
           </div>
         </div>
 
-        <Button onClick={handleCalculate} disabled={loading} className="w-full btn-3d" size="lg">
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Consultando CEP e calculando...
-            </>
-          ) : (
-            <>
-              <Truck className="mr-2 h-5 w-5" /> Calcular Frete
-            </>
-          )}
-        </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+          <div className="space-y-2">
+            <Label htmlFor="salePriceShip">Preço de venda (define se o frete é grátis)</Label>
+            <Input id="salePriceShip" inputMode="decimal" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} />
+          </div>
+          <Button onClick={handleCalculate} disabled={loading} className="w-full btn-3d" size="lg">
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Consultando CEP...
+              </>
+            ) : (
+              <>
+                <MapPin className="mr-2 h-5 w-5" /> Confirmar endereços pelo CEP
+              </>
+            )}
+          </Button>
+        </div>
 
-        {result && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                <p className="text-xs text-muted-foreground flex items-center gap-2 mb-1">
-                  <MapPin className="h-3.5 w-3.5" /> Origem
-                </p>
-                <p className="font-semibold">{result.origin.city} - {result.origin.uf}</p>
-                <p className="text-xs text-muted-foreground">
-                  {[result.origin.street, result.origin.neighborhood].filter(Boolean).join(", ") || result.origin.cep}
-                </p>
-              </div>
-              <div className="p-4 rounded-xl bg-secondary/50 border border-border">
-                <p className="text-xs text-muted-foreground flex items-center gap-2 mb-1">
-                  <MapPin className="h-3.5 w-3.5" /> Destino
-                </p>
-                <p className="font-semibold">{result.destination.city} - {result.destination.uf}</p>
-                <p className="text-xs text-muted-foreground">
-                  {[result.destination.street, result.destination.neighborhood].filter(Boolean).join(", ") || result.destination.cep}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-2 text-xs">
-              <Badge variant="secondary" className="gap-1">
-                <Package className="h-3 w-3" /> Peso real {result.realWeight} kg
-              </Badge>
-              <Badge variant="secondary">Peso cubado {result.cubedWeight} kg</Badge>
-              <Badge variant="default">Peso taxado {result.billedWeight} kg</Badge>
-              {result.insurance > 0 && <Badge variant="outline">Seguro {formatCurrency(result.insurance)}</Badge>}
-            </div>
-
-            <div className="space-y-3">
-              <p className="font-bold text-lg">Opções de envio</p>
-              {result.options.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => setSelected(option.id)}
-                  className={`w-full text-left p-4 rounded-xl border transition-all ${
-                    selected === option.id
-                      ? "border-primary bg-primary/10 shadow-glow"
-                      : "border-border bg-secondary/40 hover:border-primary/40"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-semibold">{option.service}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {option.carrier} • até {Math.max(option.days, 1)} dia(s) úteis • {option.note}
-                      </p>
-                    </div>
-                    <p className="text-xl font-black text-primary whitespace-nowrap">
-                      {formatCurrency(option.price)}
-                    </p>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            <div className="space-y-3">
-              <p className="font-bold text-lg">Lucro líquido por produto com este frete</p>
-              {productRows.length === 0 ? (
-                <div className="p-4 rounded-xl border border-border bg-secondary/40 text-sm text-muted-foreground flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4" />
-                  Cadastre um produto na calculadora para ver o impacto do frete no lucro.
+        {(origin || destination) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
+            {[origin, destination].map((addr, i) =>
+              addr ? (
+                <div key={i} className="p-4 rounded-xl bg-secondary/50 border border-border">
+                  <p className="text-xs text-muted-foreground flex items-center gap-2 mb-1">
+                    <MapPin className="h-3.5 w-3.5" /> {i === 0 ? "Origem" : "Destino"}
+                  </p>
+                  <p className="font-semibold">{addr.city} - {addr.uf}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {[addr.street, addr.neighborhood].filter(Boolean).join(", ") || addr.cep}
+                  </p>
                 </div>
-              ) : (
-                productRows.map(({ product, before, after }) => {
-                  const diff = after.netProfit - before.netProfit;
-                  const positive = after.netProfit > 0;
-                  return (
-                    <div
-                      key={product.id}
-                      className="p-4 rounded-xl border border-border bg-secondary/40 flex flex-wrap items-center justify-between gap-3"
-                    >
-                      <div className="min-w-[160px]">
-                        <p className="font-semibold">{product.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {product.marketplace} • {product.plan} • venda {formatCurrency(product.salePrice)}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground">Frete aplicado</p>
-                        <p className="font-semibold">{formatCurrency(selectedOption?.price ?? 0)}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground">Lucro líquido</p>
-                        <p className={`text-xl font-black ${positive ? "text-profit" : "text-loss"}`}>
-                          {formatCurrency(after.netProfit)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Margem {formatPercentage(after.profitMargin)} • {diff >= 0 ? "+" : ""}
-                          {formatCurrency(diff)} vs. frete salvo
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
-            <p className="text-xs text-muted-foreground">{result.reference}</p>
+              ) : null
+            )}
           </div>
         )}
+
+        <div className="flex flex-wrap gap-2 text-xs">
+          <Badge variant="secondary" className="gap-1">
+            <Package className="h-3 w-3" /> Peso real {numbers.weight} kg
+          </Badge>
+          <Badge variant="secondary">
+            Cubado {(Math.round(cubedWeight(numbers.length, numbers.width, numbers.height) * 1000) / 1000)} kg
+          </Badge>
+          <Badge variant="default">Taxado {Math.round(billedWeight * 1000) / 1000} kg</Badge>
+          <Badge variant="outline">{ZONE_LABEL[zone]}</Badge>
+        </div>
+
+        <div className="space-y-3">
+          <p className="font-bold text-lg">Opções de envio do {marketplace}</p>
+          {quotes.map((q) => (
+            <button
+              key={q.service}
+              type="button"
+              onClick={() => setSelected(q.service)}
+              className={`w-full text-left p-4 rounded-xl border transition-all ${
+                selectedQuote?.service === q.service
+                  ? "border-primary bg-primary/10 shadow-glow"
+                  : "border-border bg-secondary/40 hover:border-primary/40"
+              }`}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-semibold">{q.service}</p>
+                  <p className="text-xs text-muted-foreground">
+                    até {q.days} dia(s) úteis • {q.note}
+                  </p>
+                </div>
+                <div className="text-right whitespace-nowrap">
+                  <p className="text-xl font-black text-primary">
+                    {q.paidBy === "Comprador" ? formatCurrency(q.fullPrice) : formatCurrency(q.sellerPrice)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Pago pelo {q.paidBy.toLowerCase()}
+                    {q.subsidy > 0 && ` • marketplace cobre ${formatCurrency(q.subsidy)}`}
+                  </p>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {cepTable.length > 0 && (
+          <div className="space-y-3">
+            <p className="font-bold text-lg flex items-center gap-2">
+              <Table2 className="h-5 w-5 text-primary" />
+              Tabela de frete por faixa de CEP — {selectedQuote?.service}
+            </p>
+            <div className="overflow-x-auto rounded-xl border border-border">
+              <table className="w-full text-sm">
+                <thead className="bg-secondary/60">
+                  <tr className="text-left">
+                    <th className="p-3 font-semibold">Faixa de CEP</th>
+                    <th className="p-3 font-semibold">Destino</th>
+                    <th className="p-3 font-semibold">Zona</th>
+                    <th className="p-3 font-semibold text-right">Frete cheio</th>
+                    <th className="p-3 font-semibold text-right">Custo do vendedor</th>
+                    <th className="p-3 font-semibold text-right">Prazo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cepTable.map(({ range, zone: z, quote }) => (
+                    <tr
+                      key={`${range.uf}-${range.from}`}
+                      className={`border-t border-border ${
+                        destRange && range.from === destRange.from ? "bg-primary/10" : ""
+                      }`}
+                    >
+                      <td className="p-3 font-mono text-xs">{formatCepRange(range)}</td>
+                      <td className="p-3">{range.label} ({range.uf})</td>
+                      <td className="p-3">{z}</td>
+                      <td className="p-3 text-right">{formatCurrency(quote.fullPrice)}</td>
+                      <td className="p-3 text-right font-semibold text-primary">
+                        {formatCurrency(quote.sellerPrice)}
+                      </td>
+                      <td className="p-3 text-right">{quote.days} dias</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Base: tabela Correios PAC {SHIPPING_UPDATED_AT} ({BASE_TABLE.length} faixas de peso, cubagem /6000)
+              com os fatores e subsídios de cada marketplace. Ao atualizar as tarifas, esta tabela e o lucro por
+              produto mudam juntos.
+            </p>
+          </div>
+        )}
+
+        <div className="space-y-3">
+          <p className="font-bold text-lg">Lucro líquido por produto com este frete</p>
+          {productRows.length === 0 ? (
+            <div className="p-4 rounded-xl border border-border bg-secondary/40 text-sm text-muted-foreground flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              Cadastre um produto na calculadora para ver o impacto do frete no lucro.
+            </div>
+          ) : (
+            productRows.map(({ product, before, after, quote }) => {
+              const diff = after.netProfit - before.netProfit;
+              const positive = after.netProfit > 0;
+              return (
+                <div
+                  key={product.id}
+                  className="p-4 rounded-xl border border-border bg-secondary/40 flex flex-wrap items-center justify-between gap-3"
+                >
+                  <div className="min-w-[160px]">
+                    <p className="font-semibold">{product.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {product.marketplace} • {quote.service} • venda {formatCurrency(product.salePrice)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">Frete do vendedor</p>
+                    <p className="font-semibold">{formatCurrency(quote.sellerPrice)}</p>
+                    <p className="text-xs text-muted-foreground">Pago pelo {quote.paidBy.toLowerCase()}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">Lucro líquido</p>
+                    <p className={`text-xl font-black ${positive ? "text-profit" : "text-loss"}`}>
+                      {formatCurrency(after.netProfit)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Margem {formatPercentage(after.profitMargin)} • {diff >= 0 ? "+" : ""}
+                      {formatCurrency(diff)} vs. frete salvo
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       </CardContent>
     </Card>
   );
