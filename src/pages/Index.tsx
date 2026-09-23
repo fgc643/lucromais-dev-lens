@@ -20,7 +20,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Calculator, TrendingUp, Loader2, Sparkles, Shield, Zap, Users, Search, Settings, BarChart3 } from "lucide-react";
 import { GoldenParticles } from "@/components/GoldenParticles";
 import { SupplierManager } from "@/components/SupplierManager";
-import { SmartProductSearch } from "@/components/SmartProductSearch";
 import { ShippingCalculator } from "@/components/ShippingCalculator";
 
 const Index = () => {
@@ -229,13 +228,6 @@ const Index = () => {
           </div>
         </main>
 
-
-        {/* Seção de Busca Inteligente com IA */}
-        <section className="container mx-auto px-4 py-12">
-          <ParallaxCard className="cascade-init animate-cascade-glow">
-            <SmartProductSearch />
-          </ParallaxCard>
-        </section>
 
         {/* Seção de Frete por CEP */}
         <section className="container mx-auto px-4 py-12">
