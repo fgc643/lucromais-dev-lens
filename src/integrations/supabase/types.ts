@@ -163,44 +163,80 @@ export type Database = {
       suppliers: {
         Row: {
           address: string | null
+          average_discount: number | null
           category: string | null
+          city: string | null
+          cnpj: string | null
           company: string | null
           created_at: string
           email: string | null
           id: string
+          last_purchase_at: string | null
+          lead_time_days: number | null
+          min_order_value: number | null
           name: string
           notes: string | null
+          payment_terms: string | null
           phone: string | null
+          products_supplied: string | null
+          rating: number | null
+          state: string | null
+          status: string | null
           updated_at: string
           user_id: string
+          website: string | null
           whatsapp: string | null
         }
         Insert: {
           address?: string | null
+          average_discount?: number | null
           category?: string | null
+          city?: string | null
+          cnpj?: string | null
           company?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          last_purchase_at?: string | null
+          lead_time_days?: number | null
+          min_order_value?: number | null
           name: string
           notes?: string | null
+          payment_terms?: string | null
           phone?: string | null
+          products_supplied?: string | null
+          rating?: number | null
+          state?: string | null
+          status?: string | null
           updated_at?: string
           user_id: string
+          website?: string | null
           whatsapp?: string | null
         }
         Update: {
           address?: string | null
+          average_discount?: number | null
           category?: string | null
+          city?: string | null
+          cnpj?: string | null
           company?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          last_purchase_at?: string | null
+          lead_time_days?: number | null
+          min_order_value?: number | null
           name?: string
           notes?: string | null
+          payment_terms?: string | null
           phone?: string | null
+          products_supplied?: string | null
+          rating?: number | null
+          state?: string | null
+          status?: string | null
           updated_at?: string
           user_id?: string
+          website?: string | null
           whatsapp?: string | null
         }
         Relationships: []
