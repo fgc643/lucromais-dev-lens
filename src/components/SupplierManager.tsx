@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { SupplierImport } from "./SupplierImport";
 import {
   Plus, Pencil, Trash2, Phone, Mail, MessageCircle, Building2, Tag, Search, Users,
   Star, Truck, Wallet, Globe, MapPin, TrendingUp, AlertTriangle, Sparkles,
@@ -328,6 +329,7 @@ export function SupplierManager() {
           </Select>
         </div>
 
+        {user && <SupplierImport userId={user.id} onImported={fetchSuppliers} />}
         <Dialog open={isOpen} onOpenChange={(open) => {
           setIsOpen(open);
           if (!open) { setEditingId(null); setFormData(emptySupplier); }
