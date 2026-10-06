@@ -227,7 +227,7 @@ export function SupplierManager() {
     const best = [...suppliers].sort((a, b) => supplierScore(b) - supplierScore(a))[0];
     const stale = suppliers.filter((s) => {
       const d = daysSince(s.last_purchase_at);
-      return (s.status || "ativo") === "ativo" && (d === null || d > 120);
+      return (s.status || "ativo") === "ativo" && d !== null && d > 120;
     });
     return {
       total: suppliers.length,
