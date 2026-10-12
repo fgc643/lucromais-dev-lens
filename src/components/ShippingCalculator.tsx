@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -14,7 +14,6 @@ import { MARKETPLACES } from "@/data/marketplaces";
 import {
   BASE_TABLE,
   CEP_RANGES,
-  SHIPPING_UPDATED_AT,
   ZONE_LABEL,
   Zone,
   cubedWeight,
@@ -35,6 +34,8 @@ interface AddressInfo {
 
 interface Props {
   products: ProductData[];
+  currentProduct?: ProductData | null;
+  onApplyShipping?: (service: string, sellerPrice: number) => void;
 }
 
 const maskCep = (value: string) => {
@@ -42,7 +43,7 @@ const maskCep = (value: string) => {
   return digits.length > 5 ? `${digits.slice(0, 5)}-${digits.slice(5)}` : digits;
 };
 
-export const ShippingCalculator = ({ products }: Props) => {
+export const ShippingCalculator = ({ products, currentProduct, onApplyShipping }: Props) => {
   const [originCep, setOriginCep] = useState("");
   const [destCep, setDestCep] = useState("");
   const [weight, setWeight] = useState("0.5");
@@ -54,12 +55,23 @@ export const ShippingCalculator = ({ products }: Props) => {
   const [destination, setDestination] = useState<AddressInfo | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
 
+  // Produto em cálculo: marketplace, preço e opção de frete vêm dele automaticamente
+  const linked = !!currentProduct;
+  const activeMarketplace = currentProduct?.marketplace ?? marketplace;
+  const planShippingDiscount = currentProduct
+    ? MARKETPLACES.find((m) => m.name === currentProduct.marketplace)?.plans[currentProduct.plan]?.shippingDiscount ?? 0
+    : 0;
+  useEffect(() => {
+    setSelected(currentProduct?.shippingService ?? null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentProduct?.id, currentProduct?.marketplace]);
+
   const numbers = {
     weight: Number(weight.replace(",", ".")) || 0,
     length: Number(dims.length) || 20,
     width: Number(dims.width) || 15,
     height: Number(dims.height) || 10,
-    salePrice: Number(salePrice.replace(",", ".")) || 0,
+    salePrice: currentProduct ? currentProduct.salePrice : Number(salePrice.replace(",", ".")) || 0,
   };
 
   const originRange = findCepRange(originCep);
@@ -67,7 +79,7 @@ export const ShippingCalculator = ({ products }: Props) => {
   const zone: Zone =
     originRange && destRange ? getZone(originRange.region, destRange.region) : 1;
 
-  const options = useMemo(() => getShippingOptionsFor(marketplace), [marketplace]);
+  const options = useMemo(() => getShippingOptionsFor(activeMarketplace), [activeMarketplace]);
 
   const quotes = useMemo(
     () =>
@@ -80,13 +92,21 @@ export const ShippingCalculator = ({ products }: Props) => {
           width: numbers.width,
           height: numbers.height,
           salePrice: numbers.salePrice,
+          planShippingDiscount,
         })
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [options, zone, weight, dims.length, dims.width, dims.height, salePrice]
+    [options, zone, weight, dims.length, dims.width, dims.height, numbers.salePrice, planShippingDiscount]
   );
 
   const selectedQuote = quotes.find((q) => q.service === selected) ?? quotes[0] ?? null;
+
+  useEffect(() => {
+    if (currentProduct && selectedQuote && onApplyShipping) {
+      onApplyShipping(selectedQuote.service, selectedQuote.sellerPrice);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentProduct?.id, selectedQuote?.service, selectedQuote?.sellerPrice]);
 
   const billedWeight = Math.max(
     numbers.weight,
@@ -188,7 +208,7 @@ export const ShippingCalculator = ({ products }: Props) => {
               Frete por CEP e Lucro Líquido
             </p>
             <p className="text-xs text-muted-foreground font-normal">
-              Tabela de frete por faixa de CEP de cada marketplace — atualizada em {SHIPPING_UPDATED_AT}
+              Estimativa baseada na tabela dos Correios; confirme no simulador oficial do marketplace
             </p>
           </div>
         </CardTitle>
@@ -231,7 +251,7 @@ export const ShippingCalculator = ({ products }: Props) => {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           <div className="space-y-2 col-span-2">
             <Label>Marketplace</Label>
-            <Select value={marketplace} onValueChange={(v) => { setMarketplace(v); setSelected(null); }}>
+            <Select disabled={linked} value={activeMarketplace} onValueChange={(v) => { setMarketplace(v); setSelected(null); }}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -265,7 +285,7 @@ export const ShippingCalculator = ({ products }: Props) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
           <div className="space-y-2">
             <Label htmlFor="salePriceShip">Preço de venda (define se o frete é grátis)</Label>
-            <Input id="salePriceShip" inputMode="decimal" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} />
+            <Input id="salePriceShip" inputMode="decimal" disabled={linked} value={linked ? String(numbers.salePrice) : salePrice} onChange={(e) => setSalePrice(e.target.value)} />
           </div>
           <Button onClick={handleCalculate} disabled={loading} className="w-full btn-3d" size="lg">
             {loading ? (
@@ -310,7 +330,12 @@ export const ShippingCalculator = ({ products }: Props) => {
         </div>
 
         <div className="space-y-3">
-          <p className="font-bold text-lg">Opções de envio do {marketplace}</p>
+          <p className="font-bold text-lg">Opções de envio do {activeMarketplace}</p>
+          {linked && (
+            <p className="text-xs text-muted-foreground">
+              Usando o produto <b>{currentProduct!.name}</b> ({currentProduct!.plan}). A opção escolhida vira o frete do detalhamento de custos.
+            </p>
+          )}
           {quotes.map((q) => (
             <button
               key={q.service}
@@ -336,6 +361,7 @@ export const ShippingCalculator = ({ products }: Props) => {
                   <p className="text-xs text-muted-foreground">
                     Pago pelo {q.paidBy.toLowerCase()}
                     {q.subsidy > 0 && ` • marketplace cobre ${formatCurrency(q.subsidy)}`}
+                    {q.storage > 0 && ` • inclui armazenagem ${formatCurrency(q.storage)}`}
                   </p>
                 </div>
               </div>
@@ -383,7 +409,7 @@ export const ShippingCalculator = ({ products }: Props) => {
               </table>
             </div>
             <p className="text-xs text-muted-foreground">
-              Base: tabela Correios PAC {SHIPPING_UPDATED_AT} ({BASE_TABLE.length} faixas de peso, cubagem /6000)
+              Estimativa baseada na tabela dos Correios PAC ({BASE_TABLE.length} faixas de peso, cubagem /6000)
               com os fatores e subsídios de cada marketplace. Ao atualizar as tarifas, esta tabela e o lucro por
               produto mudam juntos.
             </p>
