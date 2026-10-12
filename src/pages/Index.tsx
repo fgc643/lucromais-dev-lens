@@ -1,3 +1,4 @@
+import { calculateProfit } from "@/utils/calculator";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { ProductData } from "@/types/calculator";
