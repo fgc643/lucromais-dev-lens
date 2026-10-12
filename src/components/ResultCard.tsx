@@ -105,78 +105,55 @@ export const ResultCard = ({ product }: ResultCardProps) => {
             <Sparkles className="h-6 w-6 animate-spin" />
           </button>
 
-          {/* Detalhamento de Custos com Visual Luxuoso */}
-          <div className="space-y-4 p-6 rounded-xl luxury-card shadow-3d border border-primary/10">
-            <h4 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              💰 Detalhamento Completo de Custos
-            </h4>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-destructive/10 rounded-lg border border-destructive/20">
-                <span className="text-sm font-medium">🏪 Comissão do Marketplace</span>
-                <span className="font-bold text-destructive text-lg">
-                  {formatCurrency(results.fees.commission)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-warning/10 rounded-lg border border-warning/20">
-                <span className="text-sm font-medium">💳 Taxa de Pagamento</span>
-                <span className="font-bold text-warning text-lg">
-                  {formatCurrency(results.fees.payment)}
-                </span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-info/10 rounded-lg border border-info/20">
-                <span className="text-sm font-medium">📦 Custo de Frete</span>
-                <span className="font-bold text-info text-lg">
-                  {formatCurrency(results.fees.shipping)}
-                </span>
-              </div>
-              
-              {/* Custos Adicionais */}
-              {product.packagingCost > 0 && (
-                <div className="flex justify-between items-center p-3 bg-accent/10 rounded-lg border border-accent/20">
-                  <span className="text-sm font-medium">📦 Embalagem</span>
-                  <span className="font-bold text-accent text-lg">
-                    {formatCurrency(product.packagingCost)}
-                  </span>
+          {/* Conta passo a passo: cada custo aparece e é subtraído uma única vez */}
+          {(() => {
+            const lines = [
+              { label: "Custo do produto", value: product.costPrice },
+              { label: "Comissão do marketplace", value: results.fees.commission },
+              { label: "Taxa de pagamento / parcelamento", value: results.fees.payment, optional: true },
+              { label: "Frete", value: results.fees.shipping },
+              { label: "Embalagem", value: results.fees.packaging },
+              { label: `Ads (${product.adsCost || 0}%)`, value: results.fees.ads },
+              { label: "Custo operacional", value: results.fees.operational },
+              { label: `Simples Nacional (${product.simplesNacionalRate || 0}%)`, value: results.fees.simplesNacional },
+            ].filter((l) => !l.optional || l.value > 0);
+            const total = lines.reduce((s, l) => s + l.value, 0);
+            return (
+              <div className="space-y-3 p-6 rounded-xl luxury-card shadow-3d border border-primary/10">
+                <h4 className="font-bold text-lg flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Conta passo a passo
+                </h4>
+                <div className="flex justify-between items-center p-3 rounded-lg bg-primary/10 border border-primary/20">
+                  <span className="font-semibold">Preço de venda</span>
+                  <span className="font-bold text-primary text-lg">{formatCurrency(product.salePrice)}</span>
                 </div>
-              )}
-              
-              {product.adsCost > 0 && (
-                <div className="flex justify-between items-center p-3 bg-primary/10 rounded-lg border border-primary/20">
-                  <span className="text-sm font-medium">📢 Custo de ADS</span>
-                  <span className="font-bold text-primary text-lg">
-                    {formatCurrency((product.salePrice * product.adsCost) / 100)}
-                  </span>
+                {lines.map((l, i) => (
+                  <div key={l.label} className="flex justify-between items-center px-3 py-2 rounded-lg bg-secondary/40 border border-border">
+                    <span className="text-sm">
+                      <span className="text-muted-foreground mr-2">{i + 1}.</span>− {l.label}
+                    </span>
+                    <span className="font-semibold text-destructive">− {formatCurrency(l.value)}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between items-center p-3 rounded-lg bg-destructive/15 border border-destructive/30">
+                  <span className="font-semibold">Soma de todos os custos</span>
+                  <span className="font-bold text-destructive text-lg">{formatCurrency(total)}</span>
                 </div>
-              )}
-              
-              {product.operationalCost > 0 && (
-                <div className="flex justify-between items-center p-3 bg-secondary/50 rounded-lg border border-secondary">
-                  <span className="text-sm font-medium">💼 Custo Operacional</span>
-                  <span className="font-bold text-lg">
-                    {formatCurrency(product.operationalCost)}
-                  </span>
+                <div className={`p-4 rounded-lg border-2 ${profitBgClass}`}>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    {formatCurrency(product.salePrice)} − {formatCurrency(total)} =
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-lg">Lucro líquido</span>
+                    <span className={`font-black text-2xl ${profitColorClass}`}>
+                      {formatCurrency(product.salePrice - total)}
+                    </span>
+                  </div>
                 </div>
-              )}
-              
-              {product.simplesNacionalRate > 0 && (
-                <div className="flex justify-between items-center p-3 bg-muted/50 rounded-lg border border-muted">
-                  <span className="text-sm font-medium">🧾 Simples Nacional ({product.simplesNacionalRate}%)</span>
-                  <span className="font-bold text-lg">
-                    {formatCurrency((product.salePrice * product.simplesNacionalRate) / 100)}
-                  </span>
-                </div>
-              )}
-              
-              <div className="h-px bg-gradient-to-r from-transparent via-primary to-transparent my-3" />
-              <div className="flex justify-between items-center p-4 bg-destructive/20 rounded-lg border-2 border-destructive/30">
-                <span className="font-bold text-lg">💸 TOTAL DE CUSTOS</span>
-                <span className="font-black text-destructive text-2xl drop-shadow-lg">
-                  {formatCurrency(results.fees.total)}
-                </span>
               </div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* Informações Adicionais Estilizadas */}
           <div className="grid grid-cols-2 gap-4">
