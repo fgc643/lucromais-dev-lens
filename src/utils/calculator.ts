@@ -10,30 +10,25 @@ export const calculateProfit = (product: ProductData): CalculationResults => {
 
   const { salePrice, costPrice, shippingCost, packagingCost, adsCost, operationalCost, simplesNacionalRate } = product;
 
-  // Calcular taxas
-  const commissionFee = (salePrice * planData.commission) / 100;
-  const fixedFee = planData.fixedFee || 0;
-  
-  // Taxa de pagamento (assumindo cartão como padrão)
-  let paymentFee = 0;
-  if (planData.paymentFee) {
-    paymentFee = (salePrice * planData.paymentFee.card) / 100;
-  }
+  // Cada custo é calculado uma única vez e entra em exatamente uma linha.
+  const commissionFee = (salePrice * planData.commission) / 100 + (planData.fixedFee || 0);
 
-  const shippingFee = shippingCost * (1 - (planData.shippingDiscount || 0));
-  
-  // Novos custos adicionados
+  // Taxa de pagamento/parcelamento (cartão) — só existe se o plano cobrar
+  const paymentFee = planData.paymentFee ? (salePrice * planData.paymentFee.card) / 100 : 0;
+
+  const shippingFee = (shippingCost || 0) * (1 - (planData.shippingDiscount || 0));
   const packagingFee = packagingCost || 0;
   const adsFee = (salePrice * (adsCost || 0)) / 100;
   const operationalFee = operationalCost || 0;
   const simplesNacionalFee = (salePrice * (simplesNacionalRate || 0)) / 100;
-  
-  const totalFees = commissionFee + fixedFee + paymentFee + shippingFee + packagingFee + adsFee + operationalFee + simplesNacionalFee;
 
-  // Calcular lucros
+  const totalFees =
+    commissionFee + paymentFee + shippingFee + packagingFee + adsFee + operationalFee + simplesNacionalFee;
+
   const grossProfit = salePrice - costPrice;
-  const netProfit = salePrice - costPrice - totalFees;
-  const profitMargin = (netProfit / salePrice) * 100;
+  // Lucro líquido = preço de venda − (produto + todas as taxas e custos)
+  const netProfit = salePrice - (costPrice + totalFees);
+  const profitMargin = salePrice > 0 ? (netProfit / salePrice) * 100 : 0;
 
   // Breakdown para gráficos
   const breakdown = [
