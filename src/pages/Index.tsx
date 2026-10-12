@@ -1,3 +1,4 @@
+import { calculateProfit } from "@/utils/calculator";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import { ProductData } from "@/types/calculator";
@@ -73,6 +74,16 @@ const Index = () => {
     }
   };
 
+
+  const handleApplyShipping = (service: string, sellerPrice: number) => {
+    setCurrentProduct((prev) => {
+      if (!prev) return prev;
+      if (prev.shippingService === service && prev.shippingFromQuote && prev.shippingCost === sellerPrice) return prev;
+      const next = { ...prev, shippingService: service, shippingCost: sellerPrice, shippingFromQuote: true };
+      try { next.results = calculateProfit(next); } catch { /* plano inválido */ }
+      return next;
+    });
+  };
 
   const handleHistoryDelete = async (id: string) => {
     await deleteProduct(id);
@@ -232,7 +243,7 @@ const Index = () => {
         {/* Seção de Frete por CEP */}
         <section className="container mx-auto px-4 py-12">
           <ParallaxCard className="cascade-init animate-cascade-glow">
-            <ShippingCalculator products={products} />
+            <ShippingCalculator products={products} currentProduct={currentProduct} onApplyShipping={handleApplyShipping} />
           </ParallaxCard>
         </section>
 

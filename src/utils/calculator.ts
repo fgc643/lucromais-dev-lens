@@ -16,7 +16,9 @@ export const calculateProfit = (product: ProductData): CalculationResults => {
   // Taxa de pagamento/parcelamento (cartão) — só existe se o plano cobrar
   const paymentFee = planData.paymentFee ? (salePrice * planData.paymentFee.card) / 100 : 0;
 
-  const shippingFee = (shippingCost || 0) * (1 - (planData.shippingDiscount || 0));
+  const shippingFee = product.shippingFromQuote
+    ? shippingCost || 0
+    : (shippingCost || 0) * (1 - (planData.shippingDiscount || 0));
   const packagingFee = packagingCost || 0;
   const adsFee = (salePrice * (adsCost || 0)) / 100;
   const operationalFee = operationalCost || 0;

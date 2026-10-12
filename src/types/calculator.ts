@@ -29,6 +29,10 @@ export interface ProductData {
   marketplace: string;
   plan: string;
   createdAt: Date;
+  /** opção de frete escolhida em "Frete por CEP" */
+  shippingService?: string;
+  /** true quando shippingCost já é o valor final do vendedor (descontos aplicados) */
+  shippingFromQuote?: boolean;
   results?: CalculationResults;
 }
 

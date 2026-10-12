@@ -119,6 +119,8 @@ export interface MarketplaceShipping {
   freeShippingFrom?: number;
   /** desconto do programa de frete grátis sobre o valor pago pelo vendedor (0.4 = 40% de desconto) */
   sellerDiscount?: number;
+  /** tarifa de armazenagem por unidade vendida (Full/fulfillment) — paga pelo vendedor mesmo sem frete grátis */
+  storageFee?: number;
   note: string;
 }
 
@@ -146,7 +148,9 @@ export const MARKETPLACE_SHIPPING: MarketplaceShipping[] = [
     daysAdjust: -2,
     freeShippingFrom: 79,
     sellerDiscount: 0.5,
-    note: "Tabela Full + tarifa de armazenagem por envio",
+    // estimativa: produto pequeno/médio ~30 dias em estoque no Full
+    storageFee: 1.5,
+    note: "Tabela Full + tarifa de armazenagem estimada por unidade",
   },
   {
     marketplace: "Shopee",
@@ -312,6 +316,8 @@ export interface ShippingQuote {
   fullPrice: number;
   /** quanto o vendedor realmente paga */
   sellerPrice: number;
+  /** tarifa de armazenagem incluída em sellerPrice */
+  storage: number;
   /** quanto o marketplace subsidia */
   subsidy: number;
   /** quem paga o frete neste preço de venda */
@@ -361,6 +367,9 @@ export const quoteShipping = ({
     const discount = Math.max(option.sellerDiscount ?? 0, planShippingDiscount);
     sellerPrice = fullPrice * (1 - discount);
   }
+  const storage = option.storageFee ?? 0;
+  const subsidy = buyerPays ? 0 : fullPrice - sellerPrice;
+  sellerPrice += storage;
 
   const round = (n: number) => Math.round(n * 100) / 100;
 
@@ -369,7 +378,8 @@ export const quoteShipping = ({
     marketplace: option.marketplace,
     fullPrice: round(fullPrice),
     sellerPrice: round(sellerPrice),
-    subsidy: round(buyerPays ? 0 : fullPrice - sellerPrice),
+    storage: round(storage),
+    subsidy: round(subsidy),
     paidBy: buyerPays ? "Comprador" : "Vendedor",
     days: Math.max(BASE_DAYS[zone] + option.daysAdjust, 1),
     billedWeight: Math.round(billedWeight * 1000) / 1000,
