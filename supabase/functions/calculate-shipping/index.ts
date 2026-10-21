@@ -1,4 +1,5 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { validateShippingInput } from '../_shared/input-validation.ts';
 
 // Tabela de referência Setembro/2026 (Correios PAC/SEDEX e logísticas de marketplace)
 // Preços por zona de destino x faixa de peso cubado.
@@ -73,11 +74,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const originCep = String(body.originCep ?? "");
     const destCep = String(body.destCep ?? "");
-    const weight = Number(body.weight ?? 0);
-    const length = Number(body.length ?? 20);
-    const width = Number(body.width ?? 15);
-    const height = Number(body.height ?? 10);
-    const declaredValue = Number(body.declaredValue ?? 0);
+    const { weight, length, width, height, declaredValue } = validateShippingInput(body);
 
     if (!originCep || !destCep || !(weight > 0)) {
       return new Response(
