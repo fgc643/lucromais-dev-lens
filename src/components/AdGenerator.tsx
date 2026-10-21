@@ -7,6 +7,8 @@ import { Badge } from "./ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from '@/hooks/useAuth';
+import { aiFunctionErrorMessage } from '@/lib/ai-function-error';
 import { 
   Sparkles, 
   Copy, 
@@ -70,6 +72,7 @@ export const AdGenerator = ({
   features 
 }: AdGeneratorProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [adData, setAdData] = useState<AdData | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -77,6 +80,10 @@ export const AdGenerator = ({
   const [activeVersion, setActiveVersion] = useState<"A" | "B">("A");
 
   const generateAd = async () => {
+    if (!user) {
+      toast({ title: 'Login necessário', description: 'Faça login para usar a IA', variant: 'destructive' });
+      return;
+    }
     if (!productName || !marketplace) {
       toast({
         title: "Dados incompletos",
@@ -98,7 +105,10 @@ export const AdGenerator = ({
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        toast({ title: 'Erro ao gerar anúncio', description: await aiFunctionErrorMessage(error), variant: 'destructive' });
+        return;
+      }
 
       if (data?.ad) {
         // Handle both new A/B format and legacy format
@@ -118,11 +128,11 @@ export const AdGenerator = ({
       } else if (data?.error) {
         throw new Error(data.error);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao gerar anúncio:', error);
       toast({
         title: "Erro ao gerar anúncio",
-        description: error.message || "Tente novamente em alguns segundos.",
+        description: 'Não foi possível gerar o anúncio. Tente novamente mais tarde.',
         variant: "destructive",
       });
     } finally {

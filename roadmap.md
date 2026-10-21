@@ -1,0 +1,4 @@
+- [ ] Require verified login and validate AI inputs without changing prompts.
+- [ ] Enforce private shared per-user hourly AI quota.
+- [ ] Show login and rate-limit messages in both AI controls.
+- [ ] Validate shipping bounds and run focused security checks.
