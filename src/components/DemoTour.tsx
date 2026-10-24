@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import * as Popover from "@radix-ui/react-popover";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { Button } from "./ui/button";
-import { PopoverContent } from "./ui/popover";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "./ui/dialog";
 import { DEMO_TOUR_KEY, shouldShowDemoTour } from "@/lib/demo-tour";
 
 const steps = [
@@ -40,23 +39,17 @@ export function DemoTour({ email }: { email?: string }) {
   if (!open || !target) return null;
 
   return (
-    <Popover.Root open key={index}>
-      <Popover.Anchor virtualRef={{ current: target }} />
-      <PopoverContent
-        role="dialog"
+    <Dialog open onOpenChange={value => { if (!value) finish(); }}>
+      <DialogContent
         aria-label="Tour da conta de demonstração"
-        side="bottom"
-        collisionPadding={16}
-        updatePositionStrategy="always"
         className="z-[100] w-80 max-w-[calc(100vw-2rem)]"
         onOpenAutoFocus={event => event.preventDefault()}
         onInteractOutside={event => event.preventDefault()}
         onEscapeKeyDown={finish}
       >
-        <Popover.Arrow className="fill-popover" />
         <p className="text-xs text-muted-foreground mb-2">Demonstração · {index + 1} de {steps.length}</p>
-        <h2 className="font-bold mb-2">{step.title}</h2>
-        <p className="text-sm text-muted-foreground">{step.text}</p>
+        <DialogTitle>{step.title}</DialogTitle>
+        <DialogDescription>{step.text}</DialogDescription>
         <div className="flex items-center justify-between gap-2 mt-4">
           <Button variant="ghost" size="sm" onClick={finish}>Pular</Button>
           <div className="flex gap-2">
@@ -66,7 +59,7 @@ export function DemoTour({ email }: { email?: string }) {
             </Button>
           </div>
         </div>
-      </PopoverContent>
-    </Popover.Root>
+      </DialogContent>
+    </Dialog>
   );
 }
