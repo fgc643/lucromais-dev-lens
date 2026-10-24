@@ -154,6 +154,10 @@ const Auth = () => {
                 </Button>
               </form>
 
+              <p className="mt-3 text-xs text-muted-foreground text-center">
+                Quer só dar uma olhada? Entre com demo@lucromais.com / Demo@2026
+              </p>
+
               {showForgotPassword && (
                 <div className="mt-4 p-4 rounded-lg border border-border bg-muted/50">
                   <h4 className="font-medium mb-2">Recuperar Senha</h4>
