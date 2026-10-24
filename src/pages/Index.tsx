@@ -8,6 +8,8 @@ import { HistoryList } from "@/components/HistoryList";
 import { ComparisonModal } from "@/components/ComparisonModal";
 import { ReverseCalculator } from "@/components/ReverseCalculator";
 import { OnboardingTutorial } from "@/components/OnboardingTutorial";
+import { DemoTour } from "@/components/DemoTour";
+import { DEMO_EMAIL } from "@/lib/demo-tour";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -33,6 +35,12 @@ const Index = () => {
   const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (user?.email?.toLowerCase() !== DEMO_EMAIL || !products.length) return;
+    const example = products[0];
+    setCurrentProduct(previous => previous ?? { ...example, results: calculateProfit(example) });
+  }, [user?.email, products]);
 
   // Check if mobile on mount
   useEffect(() => {
@@ -126,7 +134,7 @@ const Index = () => {
       {!isMobile && <div className="absolute inset-0 bg-mesh pointer-events-none"></div>}
 
       <div className="relative z-10">
-        <OnboardingTutorial />
+        {user.email?.toLowerCase() === DEMO_EMAIL ? (currentProduct && <DemoTour email={user.email} />) : <OnboardingTutorial />}
         
         {/* Header com Badge de Trial */}
         <header className="border-b border-border/40 backdrop-blur-sm bg-background/80 sticky top-0 z-50">
@@ -211,18 +219,18 @@ const Index = () => {
         <main className="container mx-auto px-4 pb-16">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Formulário */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-2 space-y-8" data-demo-product>
               <ProductForm onCalculate={handleCalculate} />
 
               {currentProduct && (
-                <div className="animate-fade-in">
+                <div className="animate-fade-in" data-demo-profit>
                   <ResultCard product={currentProduct} />
                 </div>
               )}
             </div>
 
             {/* Histórico e Ferramentas */}
-            <div className="lg:col-span-1 space-y-6">
+            <div className="lg:col-span-1 space-y-6" data-demo-history>
               <div className="flex gap-2">
                 <ReverseCalculator />
                 {currentProduct && <ComparisonModal baseProduct={currentProduct} />}
