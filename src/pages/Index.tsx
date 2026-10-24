@@ -239,7 +239,7 @@ const Index = () => {
               <HistoryList
                 key={historyRefreshTrigger}
                 products={products}
-                onItemClick={setCurrentProduct}
+                onItemClick={product => setCurrentProduct(user.email?.toLowerCase() === DEMO_EMAIL ? { ...product, results: calculateProfit(product) } : product)}
                 onItemDelete={handleHistoryDelete}
                 onClear={handleHistoryClear}
               />
