@@ -40,13 +40,14 @@ export function DemoTour({ email }: { email?: string }) {
   if (!open || !target) return null;
 
   return (
-    <Popover.Root open>
+    <Popover.Root open key={index}>
       <Popover.Anchor virtualRef={{ current: target }} />
       <PopoverContent
         role="dialog"
         aria-label="Tour da conta de demonstração"
         side="bottom"
         collisionPadding={16}
+        updatePositionStrategy="always"
         className="z-[100] w-80 max-w-[calc(100vw-2rem)]"
         onOpenAutoFocus={event => event.preventDefault()}
         onInteractOutside={event => event.preventDefault()}
