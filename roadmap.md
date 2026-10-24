@@ -2,6 +2,6 @@
 - [x] Enforce private shared per-user hourly AI quota.
 - [x] Show login and rate-limit messages in both AI controls.
 - [x] Validate shipping bounds and run focused security checks.
-- [ ] Create and seed the demo account with four calculated products and active access.
-- [ ] Add discreet demo credentials and a first-visit demo-only guided tour.
-- [ ] Verify demo sign-in, seeded results and tour behavior.
+- [x] Create and seed the demo account with four calculated products and active access.
+- [x] Add discreet demo credentials and a first-visit demo-only guided tour.
+- [x] Verify demo sign-in, seeded results and tour behavior.
