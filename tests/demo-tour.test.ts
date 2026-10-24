@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { shouldShowDemoTour } from "./demo-tour";
+import { shouldShowDemoTour } from "../src/lib/demo-tour";
 
 describe("demo-only first-visit tour", () => {
   test("shows on the demo account's first visit", () => {
