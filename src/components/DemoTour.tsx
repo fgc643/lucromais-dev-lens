@@ -7,9 +7,9 @@ import { DEMO_TOUR_KEY, shouldShowDemoTour } from "@/lib/demo-tour";
 
 const steps = [
   { title: "Cadastre um produto", text: "Preencha o nome, os preços e o marketplace neste formulário para calcular uma nova venda.", selector: "#name" },
-  { title: "Confira o lucro", text: "Este exemplo já está calculado. Veja o lucro líquido e a conta passo a passo, com cada custo descontado uma vez.", selector: "[data-demo-profit]" },
+  { title: "Confira o lucro", text: "Este exemplo já está calculado. Veja o lucro líquido e a conta passo a passo, com cada custo descontado uma vez.", selector: "[data-demo-profit] p" },
   { title: "Análise por IA", text: "Informe o nome e a categoria no formulário e use este botão para solicitar a análise do produto.", selector: "ai" },
-  { title: "Histórico de produtos", text: "Os quatro exemplos estão aqui. Clique em um produto para comparar os custos e o lucro de cada marketplace.", selector: "[data-demo-history]" },
+  { title: "Histórico de produtos", text: "Os quatro exemplos estão aqui. Clique em um produto para comparar os custos e o lucro de cada marketplace.", selector: "[data-demo-history] h3" },
 ];
 
 export function DemoTour({ email }: { email?: string }) {
