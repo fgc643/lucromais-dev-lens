@@ -1,10 +1,8 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders, requireAIUser, registerAIUsage, readAIJson, aiErrorResponse } from '../_shared/ai-security.ts';
+import { validateAIInput } from '../_shared/input-validation.ts';
 
 // Conhecimento específico por marketplace 2026
 const MARKETPLACE_COPYWRITING_2026 = `
@@ -161,7 +159,9 @@ serve(async (req) => {
   }
 
   try {
-    const { productName, category, marketplace, salePrice, costPrice, features } = await req.json();
+    const userId = await requireAIUser(req);
+    const { productName, category, marketplace, salePrice, costPrice, features } = validateAIInput(await readAIJson(req), true);
+    await registerAIUsage(userId, 'generate-ad');
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
@@ -368,11 +368,6 @@ JSON OBRIGATÓRIO:
     });
 
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-    console.error('Erro ao gerar anúncio:', error);
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return aiErrorResponse(error);
   }
 });

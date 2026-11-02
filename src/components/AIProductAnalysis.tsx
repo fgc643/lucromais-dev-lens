@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from '@/hooks/useAuth';
+import { aiFunctionErrorMessage } from '@/lib/ai-function-error';
 
 interface MarketplaceData {
   name: string;
@@ -38,8 +40,13 @@ export const AIProductAnalysis = ({ productName, category }: AIProductAnalysisPr
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const analyzeProduct = async () => {
+    if (!user) {
+      toast({ title: 'Login necessário', description: 'Faça login para usar a IA', variant: 'destructive' });
+      return;
+    }
     if (!productName.trim()) {
       toast({
         title: "⚠️ Nome obrigatório",
@@ -64,7 +71,10 @@ export const AIProductAnalysis = ({ productName, category }: AIProductAnalysisPr
         body: { productName, category }
       });
 
-      if (error) throw error;
+      if (error) {
+        toast({ title: 'Erro na análise', description: await aiFunctionErrorMessage(error), variant: 'destructive' });
+        return;
+      }
 
       if (data.success) {
         setAnalysis(data.data);
@@ -79,7 +89,7 @@ export const AIProductAnalysis = ({ productName, category }: AIProductAnalysisPr
       console.error('Erro:', error);
       toast({
         title: "Erro na análise",
-        description: error instanceof Error ? error.message : "Tente novamente",
+        description: 'Não foi possível concluir a análise. Tente novamente mais tarde.',
         variant: "destructive",
       });
     } finally {
