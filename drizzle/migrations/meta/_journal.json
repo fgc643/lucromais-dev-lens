@@ -15,6 +15,13 @@
       "when": 1792625342073,
       "tag": "0001_protect_ai_usage",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793641390562,
+      "tag": "0002_lock_profile_subscription_columns",
+      "breakpoints": true
     }
   ]
 }
