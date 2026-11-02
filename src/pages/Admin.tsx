@@ -118,15 +118,14 @@ const Admin = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.functions.invoke("admin-subscriptions", {
+        body: { action: "list" },
+      });
 
-      if (error) throw error;
+      if (error || data?.error) throw error ?? new Error(data.error);
 
-      setUsers(data || []);
-      setFilteredUsers(data || []);
+      setUsers(data.users || []);
+      setFilteredUsers(data.users || []);
     } catch (error) {
       console.error("Error fetching users:", error);
       toast({
@@ -143,21 +142,11 @@ const Admin = () => {
     setUpdatingUserId(userId);
     
     try {
-      const newExpirationDate = new Date();
-      newExpirationDate.setMonth(newExpirationDate.getMonth() + 1);
+      const { data, error } = await supabase.functions.invoke("admin-subscriptions", {
+        body: { action: currentStatus ? "deactivate" : "activate", userId },
+      });
 
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          subscription_active: !currentStatus,
-          subscription_expires_at: !currentStatus 
-            ? newExpirationDate.toISOString() 
-            : null,
-          subscription_plan: !currentStatus ? "premium" : "free",
-        })
-        .eq("id", userId);
-
-      if (error) throw error;
+      if (error || data?.error) throw error ?? new Error(data.error);
 
       toast({
         title: "Sucesso!",
@@ -183,27 +172,12 @@ const Admin = () => {
     setUpdatingUserId(userId);
     
     try {
-      const currentUser = users.find(u => u.id === userId);
-      let newExpirationDate: Date;
-      
-      if (currentUser?.subscription_expires_at) {
-        newExpirationDate = new Date(currentUser.subscription_expires_at);
-        newExpirationDate.setMonth(newExpirationDate.getMonth() + 1);
-      } else {
-        newExpirationDate = new Date();
-        newExpirationDate.setMonth(newExpirationDate.getMonth() + 1);
-      }
+      const { data, error } = await supabase.functions.invoke("admin-subscriptions", {
+        body: { action: "extend", userId },
+      });
 
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          subscription_active: true,
-          subscription_expires_at: newExpirationDate.toISOString(),
-          subscription_plan: "premium",
-        })
-        .eq("id", userId);
-
-      if (error) throw error;
+      if (error || data?.error) throw error ?? new Error(data.error);
+      const newExpirationDate = new Date(data.user.subscription_expires_at);
 
       toast({
         title: "Sucesso!",
