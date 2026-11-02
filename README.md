@@ -1,26 +1,48 @@
-# lucromais-dev-lens
+# Lucro Mais
 
-aja como um desenvolvedor   analisa esse sistema e encontre melhorias  e me fale  . ( somente isso sem altera nada . ) analisa  ...>>>>> ( https://lucromais-planilha-inteligente.lovable.app/)
+Calculadora de lucro para vendedores de marketplace. O vendedor informa custo, preço de venda, frete, embalagem, anúncios, custo operacional e imposto do Simples Nacional, e o sistema mostra o lucro líquido, a margem e para onde vai cada real.
 
-This project was built with [Lovable](https://lovable.dev).
+> Projeto de portfólio, desenvolvido com apoio de IA (Lovable). Eu defini as regras, testei os fluxos e corrigi os problemas encontrados.
 
-**Live app**: https://lucromais-dev-lens.lovable.app
+## O que tem
 
-## Build with Lovable
+- Cálculo de lucro líquido por venda, com cada custo descontado uma vez só
+- Cálculo do preço de venda para atingir um lucro desejado
+- Comparação entre marketplaces e histórico de produtos
+- Estimativa de frete por CEP (tabela interna, não consulta os Correios)
+- Cadastro de fornecedores e exportação em PDF e planilha
+- Análise de produto e gerador de anúncio com IA
+- Login com recuperação de senha e painel de administração
+- Conta de demonstração com tour guiado
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/a9fb59b0-0c16-4fc3-b03e-5fa33e8a65a1).
+## Tecnologias
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+React, TypeScript, Vite, Tailwind, Supabase (Postgres, autenticação e funções de servidor), integração com IA, Vercel.
 
-## Development
+## Segurança (o que está implementado)
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+- Cada tabela tem regra no banco que só mostra as linhas do próprio usuário
+- As funções de IA exigem login, validam o que recebem e têm limite de 20 usos por hora por usuário, aplicado também no banco
+- O usuário só edita nome e empresa; os campos de assinatura só mudam pelo servidor
+- O painel Admin altera assinaturas por uma função que confere se quem clicou é administrador
+- Testes automatizados para a validação das funções de IA e o tour da demonstração
+
+## Limitações conhecidas
+
+- O cálculo do preço para um lucro desejado ignora embalagem, anúncios, custo operacional e imposto
+- A taxa de pagamento usa sempre o valor do cartão, não o do Pix
+- As taxas dos marketplaces estão digitadas no código
+- Não há cobrança real: o teste grátis e a assinatura são só demonstração
+
+## Como rodar
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+npm install
 npm run dev
 ```
+
+Crie um arquivo `.env` com `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` do seu projeto Supabase.
+
+## Autor
+
+Flávio Augusto da Silva, Zentrixia Smart Solutions. Diadema, SP.
